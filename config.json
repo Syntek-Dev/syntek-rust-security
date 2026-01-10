@@ -1,0 +1,146 @@
+{
+  "name": "syntek-rust-security",
+  "version": "0.1.0",
+  "description": "Rust security tooling plugin for Claude Code",
+  "pluginTools": [
+    {
+      "name": "cargo-tool",
+      "description": "Extract Cargo project metadata and analyze dependencies",
+      "script": "plugins/cargo-tool.py",
+      "commands": {
+        "info": "Get project metadata from Cargo.toml",
+        "deps": "Analyze dependency tree",
+        "targets": "List build targets",
+        "features": "List feature flags",
+        "unsafe": "Count unsafe blocks in project"
+      }
+    },
+    {
+      "name": "rustc-tool",
+      "description": "Detect Rust toolchain version and configuration",
+      "script": "plugins/rustc-tool.py",
+      "commands": {
+        "version": "Get rustc version",
+        "target": "Get target triple",
+        "channel": "Get release channel (stable/beta/nightly)",
+        "sysroot": "Get sysroot path"
+      }
+    },
+    {
+      "name": "vuln-db-tool",
+      "description": "Manage RustSec vulnerability database",
+      "script": "plugins/vuln-db-tool.py",
+      "commands": {
+        "update": "Update vulnerability database",
+        "search": "Search for CVEs",
+        "stats": "Get database statistics"
+      }
+    },
+    {
+      "name": "audit-tool",
+      "description": "Orchestrate security audits using cargo-audit, cargo-deny, and cargo-geiger",
+      "script": "plugins/audit-tool.py",
+      "commands": {
+        "run": "Run comprehensive security audit",
+        "quick": "Run quick security scan",
+        "report": "Generate detailed security report"
+      }
+    },
+    {
+      "name": "fuzzer-tool",
+      "description": "Manage fuzzing infrastructure (libfuzzer, AFL++, honggfuzz)",
+      "script": "plugins/fuzzer-tool.py",
+      "commands": {
+        "init": "Initialize fuzzing infrastructure",
+        "run": "Start fuzzing campaign",
+        "corpus": "Manage fuzzing corpus",
+        "crashes": "Analyze crash dumps"
+      }
+    },
+    {
+      "name": "compliance-tool",
+      "description": "Generate compliance reports (OWASP, CWE, CVSS)",
+      "script": "plugins/compliance-tool.py",
+      "commands": {
+        "owasp": "Generate OWASP compliance report",
+        "cwe": "Map vulnerabilities to CWE categories",
+        "cvss": "Calculate CVSS scores",
+        "export": "Export reports to JSON/PDF/HTML"
+      }
+    }
+  ],
+  "agentConfiguration": {
+    "defaultModel": "sonnet",
+    "opusAgents": [
+      "threat-modeller",
+      "crypto-reviewer",
+      "pentester",
+      "rust-gdpr",
+      "rust-refactor",
+      "rust-review",
+      "rust-unsafe-minimiser",
+      "rust-api-designer"
+    ],
+    "sonnetAgents": [
+      "vuln-scanner",
+      "memory-safety",
+      "fuzzer",
+      "secrets-auditor",
+      "supply-chain",
+      "binary-analyser",
+      "compliance-auditor",
+      "rust-version",
+      "rust-docs",
+      "rust-support-articles",
+      "rust-git",
+      "rust-test-writer",
+      "rust-benchmarker",
+      "rust-dependency-manager"
+    ]
+  },
+  "skillConfiguration": {
+    "autoLoad": [
+      "rust-security-core",
+      "rust-crypto",
+      "rust-embedded",
+      "rust-web-security"
+    ]
+  },
+  "paths": {
+    "agents": "agents",
+    "skills": "skills",
+    "plugins": "plugins",
+    "templates": "templates",
+    "examples": "examples",
+    "commands": "commands",
+    "docs": "docs"
+  },
+  "integration": {
+    "syntek-dev-suite": {
+      "enabled": true,
+      "sharedAgents": ["git", "version", "docs", "review", "test-writer"],
+      "namespace": "rust-security"
+    }
+  },
+  "security": {
+    "sandboxPluginTools": true,
+    "allowedCommands": [
+      "cargo",
+      "rustc",
+      "rustup",
+      "cargo-audit",
+      "cargo-deny",
+      "cargo-geiger",
+      "cargo-fuzz",
+      "cargo-semver-checks"
+    ],
+    "restrictedPaths": [
+      "/etc",
+      "/var",
+      "/usr/bin",
+      "/bin",
+      "~/.ssh",
+      "~/.aws"
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://claude.ai/schemas/plugin-manifest.json",
+  "name": "syntek-rust-security",
+  "version": "0.1.0",
+  "description": "Comprehensive Rust security tooling for Claude Code - threat modeling, vulnerability scanning, cryptographic patterns, and memory-safe development",
+  "author": "Syntek Studio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Syntek-Studio/syntek-rust-security"
+  },
+  "homepage": "https://syntek.dev",
+  "bugs": {
+    "url": "https://github.com/Syntek-Studio/syntek-rust-security/issues"
+  },
+  "keywords": [
+    "rust",
+    "security",
+    "cryptography",
+    "memory-safety",
+    "vulnerability-scanning",
+    "threat-modeling",
+    "fuzzing",
+    "embedded-systems",
+    "compliance",
+    "penetration-testing"
+  ],
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "dependencies": {
+    "syntek-dev-suite": ">=1.0.0"
+  },
+  "main": "plugin.json",
+  "files": [
+    "agents/**/*.md",
+    "skills/**/*.md",
+    "plugins/**/*.py",
+    "templates/**/*.md",
+    "examples/**/*.md",
+    "examples/**/*.rs",
+    "commands/**/*.md",
+    "docs/**/*.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "categories": [
+    "security",
+    "rust",
+    "testing",
+    "analysis"
+  ],
+  "icon": "🔒",
+  "compatibility": {
+    "os": ["linux", "darwin", "win32"],
+    "arch": ["x64", "arm64"]
+  },
+  "requirements": {
+    "rust": {
+      "version": ">=1.70.0",
+      "components": ["cargo", "rustc", "clippy"]
+    },
+    "python": {
+      "version": ">=3.8",
+      "packages": ["toml", "subprocess", "json"]
+    },
+    "optionalTools": [
+      "cargo-audit",
+      "cargo-deny",
+      "cargo-geiger",
+      "cargo-fuzz",
+      "cargo-semver-checks"
+    ]
+  }
+}

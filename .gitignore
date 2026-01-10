@@ -55,3 +55,8 @@ node_modules/
 *.tmp
 *.bak
 .cache/
+
+# Rust
+target/
+**/*.rs.bk
+*.pdb
