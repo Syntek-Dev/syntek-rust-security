@@ -1,19 +1,16 @@
-/**
- * cargo_tool.rs
- *
- * Cargo project metadata extraction tool for Claude Code agents.
- *
- * Provides commands to extract project information, dependencies, build targets,
- * feature flags, and unsafe code analysis from Cargo projects. Outputs machine-readable
- * JSON for agent consumption.
- *
- * Commands:
- * - info: Extract basic project metadata (name, version, authors, etc.)
- * - deps: List all dependencies with versions and features
- * - targets: List compilation targets (bins, libs, examples, tests, benches)
- * - features: List available feature flags and their dependencies
- * - unsafe: Scan for unsafe code blocks across the project
- */
+//! Cargo project metadata extraction tool for Claude Code agents.
+//!
+//! Provides commands to extract project information, dependencies, build targets,
+//! feature flags, and unsafe code analysis from Cargo projects. Outputs machine-readable
+//! JSON for agent consumption.
+//!
+//! # Commands
+//!
+//! - `info` - Extract basic project metadata (name, version, authors, etc.)
+//! - `deps` - List all dependencies with versions and features
+//! - `targets` - List compilation targets (bins, libs, examples, tests, benches)
+//! - `features` - List available feature flags and their dependencies
+//! - `unsafe` - Scan for unsafe code blocks across the project
 
 use anyhow::{Context, Result};
 use cargo_metadata::{CargoOpt, Metadata, MetadataCommand, Package};
@@ -66,58 +63,95 @@ enum Commands {
     },
 }
 
+/// Project metadata extracted from Cargo.toml.
 #[derive(Serialize, Deserialize)]
 struct ProjectInfo {
+    /// Package name.
     name: String,
+    /// Package version.
     version: String,
+    /// List of package authors.
     authors: Vec<String>,
+    /// Rust edition (e.g., "2021").
     edition: String,
+    /// Minimum supported Rust version (MSRV).
     rust_version: Option<String>,
+    /// Package description.
     description: Option<String>,
+    /// SPDX license identifier.
     license: Option<String>,
+    /// Repository URL.
     repository: Option<String>,
+    /// Homepage URL.
     homepage: Option<String>,
+    /// Path to workspace root, if in a workspace.
     workspace_root: Option<String>,
+    /// Path to Cargo.toml.
     manifest_path: String,
 }
 
+/// Information about a single dependency.
 #[derive(Serialize, Deserialize)]
 struct DependencyInfo {
+    /// Dependency name.
     name: String,
+    /// Version requirement string.
     version: String,
+    /// Source (registry, git, path).
     source: String,
+    /// Enabled features for this dependency.
     features: Vec<String>,
+    /// Whether this is an optional dependency.
     optional: bool,
-    kind: String, // "normal", "dev", "build"
+    /// Dependency kind: "Normal", "Development", or "Build".
+    kind: String,
 }
 
+/// Information about a compilation target.
 #[derive(Serialize, Deserialize)]
 struct TargetInfo {
+    /// Target name.
     name: String,
-    kind: Vec<String>, // "bin", "lib", "test", "bench", "example"
+    /// Target kinds: "bin", "lib", "test", "bench", "example".
+    kind: Vec<String>,
+    /// Path to the target source file.
     src_path: String,
+    /// Rust edition for this target.
     edition: String,
+    /// Features required to build this target.
     required_features: Vec<String>,
 }
 
+/// Information about a feature flag.
 #[derive(Serialize, Deserialize)]
 struct FeatureInfo {
+    /// Feature name.
     name: String,
+    /// Dependencies activated by this feature.
     dependencies: Vec<String>,
+    /// Whether this feature is enabled by default.
     enabled_by_default: bool,
 }
 
+/// Summary of unsafe code usage in the project.
 #[derive(Serialize, Deserialize)]
 struct UnsafeInfo {
+    /// Total number of unsafe blocks found.
     total_unsafe_blocks: usize,
+    /// Number of files containing unsafe code.
     files_with_unsafe: usize,
+    /// Detailed locations of unsafe blocks.
     locations: Vec<UnsafeLocation>,
 }
 
+/// Location of an unsafe code block.
 #[derive(Serialize, Deserialize)]
 struct UnsafeLocation {
+    /// Path to the source file.
     file: String,
+    /// Line number of the unsafe block.
     line: usize,
+    /// Code context around the unsafe block.
     context: String,
 }
 
@@ -186,7 +220,11 @@ fn handle_deps(
         let dep_info = DependencyInfo {
             name: dep.name.clone(),
             version: dep.req.to_string(),
-            source: dep.source.as_ref().map(|s| s.to_string()).unwrap_or_else(|| "registry".to_string()),
+            source: dep
+                .source
+                .as_ref()
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| "registry".to_string()),
             features: dep.features.clone(),
             optional: dep.optional,
             kind,
@@ -231,7 +269,7 @@ fn handle_features(manifest_path: Option<PathBuf>) -> Result<serde_json::Value> 
         let enabled_by_default = root_package
             .features
             .get("default")
-            .map(|default_features| default_features.contains(&format!("{}", name)))
+            .map(|default_features| default_features.contains(name))
             .unwrap_or(false);
 
         let feature_info = FeatureInfo {

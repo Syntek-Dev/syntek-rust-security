@@ -1,17 +1,14 @@
-/**
- * audit_tool.rs
- *
- * Security audit orchestration tool for Claude Code agents.
- *
- * Provides commands to execute multiple security audit tools (cargo-audit, cargo-deny,
- * cargo-geiger) and aggregate their results into a unified security report. Outputs
- * machine-readable JSON for agent consumption.
- *
- * Commands:
- * - run: Execute full security audit (all tools)
- * - quick: Execute quick audit (cargo-audit only)
- * - report: Generate comprehensive security report
- */
+//! Security audit orchestration tool for Claude Code agents.
+//!
+//! Provides commands to execute multiple security audit tools (cargo-audit, cargo-deny,
+//! cargo-geiger) and aggregate their results into a unified security report. Outputs
+//! machine-readable JSON for agent consumption.
+//!
+//! # Commands
+//!
+//! - `run` - Execute full security audit (all tools)
+//! - `quick` - Execute quick audit (cargo-audit only)
+//! - `report` - Generate comprehensive security report
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -60,54 +57,90 @@ enum Commands {
     },
 }
 
+/// Complete security audit result from all tools.
 #[derive(Serialize, Deserialize)]
 struct AuditResult {
+    /// ISO 8601 timestamp when audit was performed.
     timestamp: String,
+    /// Name of the audited project.
     project_name: Option<String>,
+    /// High-level summary of audit findings.
     summary: AuditSummary,
+    /// List of discovered vulnerabilities.
     vulnerabilities: Vec<Vulnerability>,
+    /// Unsafe code statistics from cargo-geiger.
     unsafe_stats: Option<UnsafeStats>,
+    /// License compliance issues from cargo-deny.
     license_issues: Vec<LicenseIssue>,
+    /// List of audit tools that were executed.
     tools_run: Vec<String>,
 }
 
+/// Summary statistics from the security audit.
 #[derive(Serialize, Deserialize)]
 struct AuditSummary {
+    /// Total number of vulnerabilities found.
     total_vulnerabilities: usize,
+    /// Count of critical severity vulnerabilities.
     critical_count: usize,
+    /// Count of high severity vulnerabilities.
     high_count: usize,
+    /// Count of medium severity vulnerabilities.
     medium_count: usize,
+    /// Count of low severity vulnerabilities.
     low_count: usize,
+    /// Number of unsafe functions detected.
     unsafe_functions: usize,
+    /// Number of license compliance issues.
     license_issues: usize,
+    /// Whether the audit passed (no critical issues).
     passed: bool,
 }
 
+/// A single vulnerability from the security audit.
 #[derive(Serialize, Deserialize)]
 struct Vulnerability {
+    /// Vulnerability identifier (e.g., "RUSTSEC-2023-0001").
     id: String,
+    /// Name of the affected package.
     package: String,
+    /// Version of the affected package.
     version: String,
+    /// Short description of the vulnerability.
     title: String,
+    /// Severity level (critical, high, medium, low).
     severity: String,
+    /// CVSS score if available.
     cvss_score: Option<f64>,
+    /// Detailed description of the vulnerability.
     description: Option<String>,
+    /// Recommended remediation steps.
     solution: Option<String>,
 }
 
+/// Statistics about unsafe code usage from cargo-geiger.
 #[derive(Serialize, Deserialize)]
 struct UnsafeStats {
+    /// Number of unsafe functions.
     functions: usize,
+    /// Number of unsafe expressions.
     expressions: usize,
+    /// Number of unsafe impl blocks.
     impls: usize,
+    /// Number of unsafe trait declarations.
     traits: usize,
+    /// Number of unsafe methods.
     methods: usize,
 }
 
+/// A license compliance issue from cargo-deny.
 #[derive(Serialize, Deserialize)]
 struct LicenseIssue {
+    /// Name of the package with the license issue.
     package: String,
+    /// License identifier of the package.
     license: String,
+    /// Description of the compliance issue.
     issue: String,
 }
 
@@ -143,20 +176,16 @@ fn handle_run(
     vulnerabilities.extend(audit_result);
 
     // Run cargo-deny if not skipped
-    if !skip_deny {
-        if is_tool_available("cargo-deny") {
-            tools_run.push("cargo-deny".to_string());
-            let deny_result = run_cargo_deny(manifest_path.clone())?;
-            license_issues.extend(deny_result);
-        }
+    if !skip_deny && is_tool_available("cargo-deny") {
+        tools_run.push("cargo-deny".to_string());
+        let deny_result = run_cargo_deny(manifest_path.clone())?;
+        license_issues.extend(deny_result);
     }
 
     // Run cargo-geiger if not skipped
-    if !skip_geiger {
-        if is_tool_available("cargo-geiger") {
-            tools_run.push("cargo-geiger".to_string());
-            unsafe_stats = Some(run_cargo_geiger(manifest_path.clone())?);
-        }
+    if !skip_geiger && is_tool_available("cargo-geiger") {
+        tools_run.push("cargo-geiger".to_string());
+        unsafe_stats = Some(run_cargo_geiger(manifest_path.clone())?);
     }
 
     let summary = create_summary(&vulnerabilities, &license_issues, &unsafe_stats);
@@ -292,7 +321,9 @@ fn run_cargo_deny(manifest_path: Option<PathBuf>) -> Result<Vec<LicenseIssue>> {
 /// Runs cargo-geiger and parses results
 fn run_cargo_geiger(manifest_path: Option<PathBuf>) -> Result<UnsafeStats> {
     let mut cmd = Command::new("cargo");
-    cmd.arg("geiger").arg("--output-format").arg("GitHubMarkdown");
+    cmd.arg("geiger")
+        .arg("--output-format")
+        .arg("GitHubMarkdown");
 
     if let Some(path) = manifest_path {
         cmd.arg("--manifest-path").arg(path);

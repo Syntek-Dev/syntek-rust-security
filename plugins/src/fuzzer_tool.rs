@@ -1,18 +1,15 @@
-/**
- * fuzzer_tool.rs
- *
- * Fuzzing infrastructure management tool for Claude Code agents.
- *
- * Provides commands to initialize fuzzing harnesses, run fuzzing campaigns,
- * manage fuzzing corpus, and analyze crash reports. Supports cargo-fuzz and
- * libFuzzer infrastructure. Outputs machine-readable JSON for agent consumption.
- *
- * Commands:
- * - init: Initialize fuzzing infrastructure for a project
- * - run: Execute fuzzing campaign on a target
- * - corpus: Manage and inspect fuzzing corpus
- * - crashes: Analyze and report crash artifacts
- */
+//! Fuzzing infrastructure management tool for Claude Code agents.
+//!
+//! Provides commands to initialize fuzzing harnesses, run fuzzing campaigns,
+//! manage fuzzing corpus, and analyze crash reports. Supports cargo-fuzz and
+//! libFuzzer infrastructure. Outputs machine-readable JSON for agent consumption.
+//!
+//! # Commands
+//!
+//! - `init` - Initialize fuzzing infrastructure for a project
+//! - `run` - Execute fuzzing campaign on a target
+//! - `corpus` - Manage and inspect fuzzing corpus
+//! - `crashes` - Analyze and report crash artifacts
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -85,57 +82,92 @@ enum Commands {
     },
 }
 
+/// Result of initializing fuzzing infrastructure.
 #[derive(Serialize, Deserialize)]
 struct InitResult {
+    /// Whether initialization succeeded.
     success: bool,
+    /// Name of the fuzz target.
     target: String,
+    /// Path to the fuzz directory.
     fuzz_directory: String,
+    /// Path to the generated harness source file.
     harness_path: String,
+    /// Path to the corpus directory.
     corpus_path: String,
+    /// Recommended next steps for the user.
     next_steps: Vec<String>,
 }
 
+/// Result of a fuzzing campaign execution.
 #[derive(Serialize, Deserialize)]
 struct RunResult {
+    /// Whether the fuzzing run completed successfully.
     success: bool,
+    /// Name of the fuzz target.
     target: String,
+    /// Total number of test executions.
     executions: u64,
+    /// Number of inputs in the corpus.
     corpus_size: usize,
+    /// Number of crashes discovered.
     crashes_found: usize,
+    /// Total fuzzing duration in seconds.
     duration_seconds: u64,
+    /// Code coverage percentage, if available.
     coverage_percent: Option<f64>,
 }
 
+/// Information about a fuzzing corpus.
 #[derive(Serialize, Deserialize)]
 struct CorpusInfo {
+    /// Name of the fuzz target.
     target: String,
+    /// Total number of corpus inputs.
     total_inputs: usize,
+    /// Total size of all corpus files in bytes.
     total_size_bytes: u64,
+    /// Average size of corpus inputs in bytes.
     average_input_size: u64,
+    /// Code coverage metrics, if available.
     coverage_metrics: Option<CoverageMetrics>,
 }
 
+/// Code coverage metrics from fuzzing.
 #[derive(Serialize, Deserialize)]
 struct CoverageMetrics {
+    /// Number of basic blocks covered.
     blocks_covered: usize,
+    /// Total number of basic blocks in the target.
     total_blocks: usize,
+    /// Coverage percentage (0.0-100.0).
     coverage_percent: f64,
 }
 
+/// Report of crashes discovered during fuzzing.
 #[derive(Serialize, Deserialize)]
 struct CrashReport {
+    /// Name of the fuzz target.
     target: String,
+    /// Total number of crash artifacts.
     total_crashes: usize,
+    /// Number of unique crashes after deduplication.
     unique_crashes: usize,
+    /// Details of individual crash artifacts.
     crash_details: Vec<CrashDetail>,
 }
 
+/// Details of a single crash artifact.
 #[derive(Serialize, Deserialize)]
 struct CrashDetail {
+    /// Path to the crash artifact file.
     file: String,
+    /// Size of the crash input in bytes.
     size_bytes: u64,
+    /// Hash of the crash input for deduplication.
     hash: String,
-    preview: Option<String>, // First few bytes as hex
+    /// First few bytes of the input as hex (for preview).
+    preview: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -170,9 +202,7 @@ fn handle_init(
 
     // Check if cargo-fuzz is installed
     if !is_cargo_fuzz_installed() {
-        anyhow::bail!(
-            "cargo-fuzz is not installed. Install with: cargo install cargo-fuzz"
-        );
+        anyhow::bail!("cargo-fuzz is not installed. Install with: cargo install cargo-fuzz");
     }
 
     // Initialize cargo-fuzz if fuzz directory doesn't exist
@@ -203,9 +233,7 @@ fn handle_init(
         anyhow::bail!("cargo fuzz add failed");
     }
 
-    let harness_path = fuzz_dir
-        .join("fuzz_targets")
-        .join(format!("{}.rs", target));
+    let harness_path = fuzz_dir.join("fuzz_targets").join(format!("{}.rs", target));
     let corpus_path = fuzz_dir.join("corpus").join(&target);
 
     let result = InitResult {
@@ -250,9 +278,7 @@ fn handle_run(
         cmd.arg(format!("-jobs={}", jobs));
     }
 
-    let _output = cmd
-        .output()
-        .context("Failed to execute cargo fuzz run")?;
+    let _output = cmd.output().context("Failed to execute cargo fuzz run")?;
 
     // Get corpus size
     let corpus_path = project_dir.join("fuzz").join("corpus").join(&target);

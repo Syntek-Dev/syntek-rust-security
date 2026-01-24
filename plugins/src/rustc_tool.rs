@@ -1,19 +1,16 @@
-/**
- * rustc_tool.rs
- *
- * Rust toolchain detection and version information tool for Claude Code agents.
- *
- * Provides commands to detect and report information about the installed Rust
- * toolchain, including compiler version, release channel (stable/beta/nightly),
- * target triple, and sysroot location. Outputs machine-readable JSON for agent
- * consumption.
- *
- * Commands:
- * - version: Display rustc version and commit information
- * - target: Show default target triple and available targets
- * - channel: Detect release channel (stable, beta, nightly)
- * - sysroot: Display sysroot path and library locations
- */
+//! Rust toolchain detection and version information tool for Claude Code agents.
+//!
+//! Provides commands to detect and report information about the installed Rust
+//! toolchain, including compiler version, release channel (stable/beta/nightly),
+//! target triple, and sysroot location. Outputs machine-readable JSON for agent
+//! consumption.
+//!
+//! # Commands
+//!
+//! - `version` - Display rustc version and commit information
+//! - `target` - Show default target triple and available targets
+//! - `channel` - Detect release channel (stable, beta, nightly)
+//! - `sysroot` - Display sysroot path and library locations
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -60,33 +57,51 @@ enum Commands {
     },
 }
 
+/// Rust compiler version information.
 #[derive(Serialize, Deserialize)]
 struct VersionInfo {
+    /// Semantic version string (e.g., "1.92.0").
     version: String,
+    /// Git commit hash of the compiler build.
     commit_hash: Option<String>,
+    /// Date of the compiler build commit.
     commit_date: Option<String>,
+    /// Host target triple (e.g., "x86_64-unknown-linux-gnu").
     host: String,
+    /// Release version string.
     release: String,
+    /// LLVM version used by the compiler.
     llvm_version: Option<String>,
 }
 
+/// Target triple information.
 #[derive(Serialize, Deserialize)]
 struct TargetInfo {
+    /// Default compilation target for this host.
     default_target: String,
+    /// List of installed cross-compilation targets.
     installed_targets: Vec<String>,
 }
 
+/// Release channel information.
 #[derive(Serialize, Deserialize)]
 struct ChannelInfo {
-    channel: String, // "stable", "beta", "nightly"
+    /// Release channel name: "stable", "beta", or "nightly".
+    channel: String,
+    /// Full version string including channel suffix.
     version: String,
+    /// Whether this is a nightly toolchain.
     is_nightly: bool,
 }
 
+/// Sysroot path information.
 #[derive(Serialize, Deserialize)]
 struct SysrootInfo {
+    /// Path to the Rust sysroot directory.
     sysroot: String,
+    /// Path to the Rust libraries.
     lib_path: Option<String>,
+    /// Path to the Rust standard library source.
     src_path: Option<String>,
 }
 
@@ -105,9 +120,9 @@ fn main() -> Result<()> {
 }
 
 /// Extracts rustc version and commit information
-fn handle_version(verbose: bool) -> Result<serde_json::Value> {
+fn handle_version(_verbose: bool) -> Result<serde_json::Value> {
     let output = Command::new("rustc")
-        .arg(if verbose { "--version" } else { "--version" })
+        .arg("--version")
         .arg("--verbose")
         .output()
         .context("Failed to execute rustc. Is Rust installed?")?;
@@ -126,6 +141,9 @@ fn handle_version(verbose: bool) -> Result<serde_json::Value> {
     let mut release = String::new();
     let mut llvm_version = None;
 
+    // Pre-compile regex outside the loop
+    let commit_re = Regex::new(r"\(([a-f0-9]+) (\d{4}-\d{2}-\d{2})\)").unwrap();
+
     for line in stdout.lines() {
         if line.starts_with("rustc ") {
             // Extract version from "rustc 1.70.0 (hash date)"
@@ -135,8 +153,7 @@ fn handle_version(verbose: bool) -> Result<serde_json::Value> {
             }
             if parts.len() >= 3 {
                 let hash_date = parts[2..].join(" ");
-                let re = Regex::new(r"\(([a-f0-9]+) (\d{4}-\d{2}-\d{2})\)").unwrap();
-                if let Some(caps) = re.captures(&hash_date) {
+                if let Some(caps) = commit_re.captures(&hash_date) {
                     commit_hash = Some(caps[1].to_string());
                     commit_date = Some(caps[2].to_string());
                 }
@@ -146,7 +163,11 @@ fn handle_version(verbose: bool) -> Result<serde_json::Value> {
         } else if line.starts_with("release: ") {
             release = line.strip_prefix("release: ").unwrap_or("").to_string();
         } else if line.starts_with("LLVM version: ") {
-            llvm_version = Some(line.strip_prefix("LLVM version: ").unwrap_or("").to_string());
+            llvm_version = Some(
+                line.strip_prefix("LLVM version: ")
+                    .unwrap_or("")
+                    .to_string(),
+            );
         }
     }
 

@@ -1,17 +1,14 @@
-/**
- * vuln_db_tool.rs
- *
- * RustSec vulnerability database management tool for Claude Code agents.
- *
- * Provides commands to manage the local RustSec advisory database, search for
- * known vulnerabilities, and retrieve statistics about the vulnerability landscape.
- * Outputs machine-readable JSON for agent consumption.
- *
- * Commands:
- * - update: Update the local RustSec advisory database
- * - search: Search for advisories by crate name or CVE ID
- * - stats: Display database statistics (total advisories, recent additions, etc.)
- */
+//! RustSec vulnerability database management tool for Claude Code agents.
+//!
+//! Provides commands to manage the local RustSec advisory database, search for
+//! known vulnerabilities, and retrieve statistics about the vulnerability landscape.
+//! Outputs machine-readable JSON for agent consumption.
+//!
+//! # Commands
+//!
+//! - `update` - Update the local RustSec advisory database
+//! - `search` - Search for advisories by crate name or CVE ID
+//! - `stats` - Display database statistics (total advisories, recent additions, etc.)
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -59,51 +56,84 @@ enum Commands {
     Stats,
 }
 
+/// Result of updating the RustSec advisory database.
 #[derive(Serialize, Deserialize)]
 struct UpdateInfo {
+    /// Whether the update succeeded.
     success: bool,
+    /// Git commit hash of the database.
     commit: Option<String>,
+    /// ISO 8601 timestamp of the update.
     updated_at: String,
+    /// Total number of advisories in the database.
     advisories_count: usize,
 }
 
+/// Information about a single security advisory.
 #[derive(Serialize, Deserialize)]
 struct AdvisoryInfo {
+    /// Advisory identifier (e.g., "RUSTSEC-2023-0001").
     id: String,
+    /// Name of the affected package.
     package: String,
+    /// Short description of the vulnerability.
     title: String,
+    /// Detailed description, if requested.
     description: Option<String>,
+    /// Date the advisory was published.
     date: String,
+    /// URL to the advisory or related information.
     url: Option<String>,
+    /// CVSS score as a string.
     cvss: Option<String>,
+    /// Keywords categorizing the advisory.
     keywords: Vec<String>,
+    /// Version ranges affected by the vulnerability.
     affected_versions: Vec<String>,
+    /// Versions with patches for the vulnerability.
     patched_versions: Vec<String>,
+    /// Versions that are not affected.
     unaffected_versions: Vec<String>,
 }
 
+/// Result of searching the advisory database.
 #[derive(Serialize, Deserialize)]
 struct SearchResult {
+    /// The search query string.
     query: String,
+    /// Matching advisories.
     matches: Vec<AdvisoryInfo>,
+    /// Total number of matches found.
     total_matches: usize,
 }
 
+/// Statistics about the advisory database.
 #[derive(Serialize, Deserialize)]
 struct DatabaseStats {
+    /// Total number of advisories in the database.
     total_advisories: usize,
+    /// Number of unique crates with advisories.
     total_crates: usize,
-    recent_advisories: Vec<AdvisoryInfo>, // Last 10
+    /// Most recent advisories (last 10).
+    recent_advisories: Vec<AdvisoryInfo>,
+    /// Distribution of advisories by severity.
     severity_breakdown: SeverityBreakdown,
+    /// ISO 8601 timestamp of last database update.
     last_updated: Option<String>,
 }
 
+/// Distribution of advisories across severity levels.
 #[derive(Serialize, Deserialize)]
 struct SeverityBreakdown {
+    /// Count of critical severity advisories.
     critical: usize,
+    /// Count of high severity advisories.
     high: usize,
+    /// Count of medium severity advisories.
     medium: usize,
+    /// Count of low severity advisories.
     low: usize,
+    /// Count of advisories without severity rating.
     unknown: usize,
 }
 
@@ -157,8 +187,16 @@ fn handle_search(
 
         // Search by crate name or CVE ID
         let query_lower = query.to_lowercase();
-        let package_match = metadata.package.to_string().to_lowercase().contains(&query_lower);
-        let id_match = advisory.id().to_string().to_lowercase().contains(&query_lower);
+        let package_match = metadata
+            .package
+            .to_string()
+            .to_lowercase()
+            .contains(&query_lower);
+        let id_match = advisory
+            .id()
+            .to_string()
+            .to_lowercase()
+            .contains(&query_lower);
 
         if package_match || id_match {
             let advisory_info = convert_advisory_to_info(advisory, detailed);
@@ -251,16 +289,11 @@ fn get_default_db_path() -> Result<PathBuf> {
         .or_else(|_| std::env::var("USERPROFILE"))
         .context("Cannot determine home directory")?;
 
-    Ok(PathBuf::from(home)
-        .join(".cargo")
-        .join("advisory-db"))
+    Ok(PathBuf::from(home).join(".cargo").join("advisory-db"))
 }
 
 /// Converts a RustSec advisory to AdvisoryInfo struct
-fn convert_advisory_to_info(
-    advisory: &advisory::Advisory,
-    detailed: bool,
-) -> AdvisoryInfo {
+fn convert_advisory_to_info(advisory: &advisory::Advisory, detailed: bool) -> AdvisoryInfo {
     let metadata = &advisory.metadata;
 
     AdvisoryInfo {
@@ -274,8 +307,15 @@ fn convert_advisory_to_info(
         },
         date: metadata.date.to_string(),
         url: metadata.url.as_ref().map(|u| u.to_string()),
-        cvss: metadata.cvss.as_ref().map(|c| format!("{:.1}", c.score().value())),
-        keywords: metadata.keywords.iter().map(|k| format!("{:?}", k)).collect(),
+        cvss: metadata
+            .cvss
+            .as_ref()
+            .map(|c| format!("{:.1}", c.score().value())),
+        keywords: metadata
+            .keywords
+            .iter()
+            .map(|k| format!("{:?}", k))
+            .collect(),
         affected_versions: Vec::new(), // Version API changed - simplified for now
         patched_versions: advisory
             .versions

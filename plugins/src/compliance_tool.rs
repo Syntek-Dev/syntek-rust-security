@@ -1,18 +1,15 @@
-/**
- * compliance_tool.rs
- *
- * Compliance report generation tool for Claude Code agents.
- *
- * Provides commands to map vulnerabilities to compliance frameworks (OWASP, CWE),
- * calculate CVSS scores, and generate compliance reports in multiple formats.
- * Outputs machine-readable JSON and formatted Markdown reports for agent consumption.
- *
- * Commands:
- * - owasp: Map vulnerabilities to OWASP Top 10
- * - cwe: Map vulnerabilities to CWE (Common Weakness Enumeration)
- * - cvss: Calculate CVSS scores for vulnerabilities
- * - export: Generate compliance reports in JSON/Markdown format
- */
+//! Compliance report generation tool for Claude Code agents.
+//!
+//! Provides commands to map vulnerabilities to compliance frameworks (OWASP, CWE),
+//! calculate CVSS scores, and generate compliance reports in multiple formats.
+//! Outputs machine-readable JSON and formatted Markdown reports for agent consumption.
+//!
+//! # Commands
+//!
+//! - `owasp` - Map vulnerabilities to OWASP Top 10
+//! - `cwe` - Map vulnerabilities to CWE (Common Weakness Enumeration)
+//! - `cvss` - Calculate CVSS scores for vulnerabilities
+//! - `export` - Generate compliance reports in JSON/Markdown format
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -70,84 +67,138 @@ enum Commands {
     },
 }
 
+/// OWASP Top 10 vulnerability mapping result.
 #[derive(Serialize, Deserialize)]
 struct OwaspMapping {
+    /// OWASP version (e.g., "2021").
     version: String,
+    /// Total number of vulnerabilities analyzed.
     total_vulnerabilities: usize,
+    /// Vulnerabilities grouped by OWASP category.
     mappings: Vec<OwaspCategory>,
+    /// Count of vulnerabilities that couldn't be mapped.
     unmapped_count: usize,
 }
 
+/// A single OWASP Top 10 category with mapped vulnerabilities.
 #[derive(Serialize, Deserialize)]
 struct OwaspCategory {
+    /// OWASP category identifier (e.g., "A01:2021").
     id: String,
+    /// Human-readable category name.
     name: String,
+    /// List of vulnerability IDs in this category.
     vulnerabilities: Vec<String>,
+    /// Number of vulnerabilities in this category.
     count: usize,
+    /// Overall severity for this category.
     severity: String,
 }
 
+/// CWE (Common Weakness Enumeration) mapping result.
 #[derive(Serialize, Deserialize)]
 struct CweMapping {
+    /// Total number of vulnerabilities analyzed.
     total_vulnerabilities: usize,
+    /// Vulnerabilities grouped by CWE category.
     mappings: Vec<CweCategory>,
+    /// Count of vulnerabilities that couldn't be mapped.
     unmapped_count: usize,
 }
 
+/// A single CWE category with mapped vulnerabilities.
 #[derive(Serialize, Deserialize)]
 struct CweCategory {
+    /// CWE identifier (e.g., "CWE-119").
     cwe_id: String,
+    /// Human-readable weakness name.
     name: String,
+    /// Detailed description of the weakness.
     description: Option<String>,
+    /// List of vulnerability IDs in this category.
     vulnerabilities: Vec<String>,
+    /// Number of vulnerabilities in this category.
     count: usize,
 }
 
+/// CVSS scoring report for analyzed vulnerabilities.
 #[derive(Serialize, Deserialize)]
 struct CvssReport {
+    /// CVSS version used (e.g., "3.1").
     version: String,
+    /// Individual CVSS scores for each vulnerability.
     scores: Vec<CvssScore>,
+    /// Average CVSS score across all vulnerabilities.
     average_score: f64,
+    /// Distribution of vulnerabilities by severity level.
     severity_distribution: SeverityDistribution,
 }
 
+/// CVSS score details for a single vulnerability.
 #[derive(Serialize, Deserialize)]
 struct CvssScore {
+    /// Unique identifier for the vulnerability.
     vulnerability_id: String,
+    /// Base CVSS score (0.0-10.0).
     base_score: f64,
+    /// Temporal score adjustment, if calculated.
     temporal_score: Option<f64>,
+    /// Environmental score adjustment, if calculated.
     environmental_score: Option<f64>,
+    /// Severity rating derived from the score.
     severity: String,
+    /// CVSS vector string representation.
     vector_string: String,
 }
 
+/// Distribution of vulnerabilities across severity levels.
 #[derive(Serialize, Deserialize)]
 struct SeverityDistribution {
+    /// Count of critical severity vulnerabilities (9.0-10.0).
     critical: usize,
+    /// Count of high severity vulnerabilities (7.0-8.9).
     high: usize,
+    /// Count of medium severity vulnerabilities (4.0-6.9).
     medium: usize,
+    /// Count of low severity vulnerabilities (0.1-3.9).
     low: usize,
+    /// Count of informational/none severity items.
     none: usize,
 }
 
+/// Complete compliance report combining all mapping results.
 #[derive(Serialize, Deserialize)]
 struct ComplianceReport {
+    /// ISO 8601 timestamp when report was generated.
     generated_at: String,
+    /// Name of the analyzed project.
     project_name: String,
+    /// OWASP Top 10 mapping results.
     owasp_mapping: OwaspMapping,
+    /// CWE mapping results.
     cwe_mapping: CweMapping,
+    /// CVSS scoring results.
     cvss_report: CvssReport,
+    /// Executive summary with recommendations.
     summary: ComplianceSummary,
 }
 
+/// Executive summary of compliance status.
 #[derive(Serialize, Deserialize)]
 struct ComplianceSummary {
+    /// Total number of vulnerabilities found.
     total_vulnerabilities: usize,
+    /// Count of critical severity issues.
     critical_issues: usize,
+    /// Count of high severity issues.
     high_issues: usize,
+    /// Count of medium severity issues.
     medium_issues: usize,
+    /// Count of low severity issues.
     low_issues: usize,
-    compliance_score: f64, // 0-100
+    /// Overall compliance score (0-100, higher is better).
+    compliance_score: f64,
+    /// Actionable recommendations for remediation.
     recommendations: Vec<String>,
 }
 
@@ -238,7 +289,7 @@ fn handle_cwe(input: Option<PathBuf>, detailed: bool) -> Result<serde_json::Valu
         let mut category_vulns = Vec::new();
 
         for vuln in &vulnerabilities {
-            if should_map_to_cwe(vuln, &cwe_id) {
+            if should_map_to_cwe(vuln, cwe_id) {
                 category_vulns.push(vuln.clone());
             }
         }
@@ -249,7 +300,11 @@ fn handle_cwe(input: Option<PathBuf>, detailed: bool) -> Result<serde_json::Valu
             mappings.push(CweCategory {
                 cwe_id: cwe_id.to_string(),
                 name: name.to_string(),
-                description: if detailed { Some(description.to_string()) } else { None },
+                description: if detailed {
+                    Some(description.to_string())
+                } else {
+                    None
+                },
                 vulnerabilities: category_vulns,
                 count,
             });
@@ -318,11 +373,7 @@ fn handle_cvss(input: Option<PathBuf>, version: String) -> Result<serde_json::Va
 }
 
 /// Generates full compliance report
-fn handle_export(
-    input: Option<PathBuf>,
-    output: PathBuf,
-    full: bool,
-) -> Result<serde_json::Value> {
+fn handle_export(input: Option<PathBuf>, output: PathBuf, full: bool) -> Result<serde_json::Value> {
     let owasp = handle_owasp(input.clone(), "2021".to_string())?;
     let cwe = handle_cwe(input.clone(), full)?;
     let cvss = handle_cvss(input, "3.1".to_string())?;
@@ -391,15 +442,46 @@ fn should_map_to_cwe(vuln_id: &str, cwe_id: &str) -> bool {
 /// Returns common CWE mappings for Rust vulnerabilities
 fn get_common_cwe_mappings() -> Vec<(&'static str, &'static str, &'static str)> {
     vec![
-        ("CWE-119", "Improper Restriction of Operations within the Bounds of a Memory Buffer",
-         "Buffer overflow vulnerabilities"),
-        ("CWE-125", "Out-of-bounds Read", "Reading beyond buffer boundaries"),
-        ("CWE-416", "Use After Free", "Using memory after it has been freed"),
-        ("CWE-787", "Out-of-bounds Write", "Writing beyond buffer boundaries"),
-        ("CWE-1104", "Use of Unmaintained Third Party Components", "Outdated dependencies"),
-        ("CWE-252", "Unchecked Return Value", "Ignoring function return values"),
-        ("CWE-476", "NULL Pointer Dereference", "Dereferencing null pointers"),
-        ("CWE-190", "Integer Overflow or Wraparound", "Integer overflow vulnerabilities"),
+        (
+            "CWE-119",
+            "Improper Restriction of Operations within the Bounds of a Memory Buffer",
+            "Buffer overflow vulnerabilities",
+        ),
+        (
+            "CWE-125",
+            "Out-of-bounds Read",
+            "Reading beyond buffer boundaries",
+        ),
+        (
+            "CWE-416",
+            "Use After Free",
+            "Using memory after it has been freed",
+        ),
+        (
+            "CWE-787",
+            "Out-of-bounds Write",
+            "Writing beyond buffer boundaries",
+        ),
+        (
+            "CWE-1104",
+            "Use of Unmaintained Third Party Components",
+            "Outdated dependencies",
+        ),
+        (
+            "CWE-252",
+            "Unchecked Return Value",
+            "Ignoring function return values",
+        ),
+        (
+            "CWE-476",
+            "NULL Pointer Dereference",
+            "Dereferencing null pointers",
+        ),
+        (
+            "CWE-190",
+            "Integer Overflow or Wraparound",
+            "Integer overflow vulnerabilities",
+        ),
     ]
 }
 
@@ -466,8 +548,14 @@ fn format_as_markdown(result: &serde_json::Value) -> Result<String> {
     // Simplified Markdown formatting
     let mut md = String::new();
     md.push_str("# Compliance Report\n\n");
-    md.push_str(&format!("Generated: {}\n\n", chrono::Utc::now().to_rfc3339()));
+    md.push_str(&format!(
+        "Generated: {}\n\n",
+        chrono::Utc::now().to_rfc3339()
+    ));
     md.push_str("## Summary\n\n");
-    md.push_str(&format!("```json\n{}\n```\n", serde_json::to_string_pretty(result)?));
+    md.push_str(&format!(
+        "```json\n{}\n```\n",
+        serde_json::to_string_pretty(result)?
+    ));
     Ok(md)
 }
