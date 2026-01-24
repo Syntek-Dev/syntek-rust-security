@@ -1,24 +1,141 @@
 # Version History
 
-**Maintained By**: Development Team
-**Language**: British English (en_GB)
+**Maintained By**: Development Team **Language**: British English (en_GB)
 **Timezone**: Europe/London
+
+---
+
+## Version 0.2.0 (2026-01-24)
+
+**Type**: Minor Release **Stability**: Beta **Breaking Changes**: None
+
+### Summary
+
+Major expansion of the Syntek Rust Security Plugin with new agents, commands,
+skills, templates, and examples. Adds comprehensive support for AI gateways,
+server infrastructure, and DIY security appliances.
+
+### Technical Details
+
+#### Architecture Changes
+
+- **Total Agents**: 50 (16 security + 34 infrastructure)
+- **Skills**: 22 domain knowledge modules (expanded from 4)
+- **Plugin Tools**: 6 Rust tools (converted from Python, with doc improvements)
+- **Templates**: 36 project templates (expanded from 9)
+- **Examples**: 159 compilable examples (expanded from 100)
+- **Commands**: 52 total (23 implemented + 29 planned)
+
+#### New Security Agents (Opus)
+
+1. **encryption-architect**: Designs custom encryption systems using AES-GCM,
+   ChaCha20-Poly1305, XChaCha20. Creates key management, envelope encryption,
+   and secure key derivation infrastructure.
+
+2. **ffi-security-reviewer**: Audits FFI boundaries for PyO3, Neon, UniFFI, and
+   wasm-bindgen. Verifies memory safety, null pointer handling, and data
+   validation across language boundaries.
+
+3. **network-security-architect**: Designs deep packet inspection engines with
+   protocol dissection, payload analysis, and real-time traffic classification.
+
+4. **server-hardener**: Comprehensive infrastructure security hardening. Reviews
+   SSH, firewall, intrusion detection, and generates hardening checklists.
+
+5. **threat-detection-architect**: Designs malware and intrusion detection
+   systems with YARA rules, signature matching, and behavioural analysis.
+
+6. **zeroize-auditor**: Verifies memory zeroisation patterns ensuring sensitive
+   data is securely wiped using zeroize and secrecy crates.
+
+#### New Infrastructure Agents (22 Sonnet)
+
+AI Gateway: ai-gateway-architect (Opus), ai-gateway-builder Server
+Infrastructure: ssh-wrapper-generator, cert-manager, vault-integrator,
+cloudflare-manager, docker-security, backup-manager, token-rotator,
+firewall-integrator Server Stack: nginx-configurator, gunicorn-configurator,
+redis-configurator, systemd-hardener DIY Security Appliances:
+router-security-builder, nas-security-builder, homeserver-security-builder,
+gateway-security-builder, malware-scanner-builder, dns-security-builder,
+intrusion-detector-builder, threat-intel-integrator
+
+#### Setup Agent
+
+- **project-initializer**: Initialises Rust projects with the security plugin.
+  Creates .claude/ directory with CLAUDE.md, security guide, settings, and
+  plugin tools.
+
+#### New Commands (30)
+
+- /init: Project initialisation
+- Encryption: /encrypt-setup, /decrypt-setup, /zeroize-audit
+- Vault: /vault-setup, /token-rotate
+- Infrastructure: /ssh-wrapper, /cert-rotate, /cloudflare-setup, /docker-harden,
+  /backup-setup, /firewall-setup, /server-harden, /ffi-audit
+- AI Gateway: /ai-gateway-setup, /ai-provider-add
+- Server Stack: /nginx-config, /gunicorn-config, /redis-config, /systemd-harden
+- DIY Appliances: /router-security-init, /nas-security-init,
+  /homeserver-security-init, /gateway-security-init, /malware-scanner-setup,
+  /ids-setup, /dns-proxy-setup, /threat-feeds-setup, /dpi-setup,
+  /quarantine-setup
+
+#### New Skills (18)
+
+FFI & Integration: rust-ffi-security, rust-vault-integration, rust-ai-gateway
+Server & Infrastructure: rust-server-security, rust-cloudflare-security,
+rust-docker-security, rust-backup-security Memory & CLI: rust-zeroize-patterns,
+rust-cli-patterns Server Stack: rust-nginx-patterns, rust-gunicorn-patterns,
+rust-redis-patterns DIY Appliances: rust-threat-detection,
+rust-network-inspection, rust-intrusion-detection, rust-dns-security,
+rust-file-scanning, rust-threat-intelligence
+
+#### Code Quality Improvements
+
+- Converted all plugin tools to proper Rust doc comment style (//! and ///)
+- Added comprehensive documentation to all structs and fields
+- Fixed all clippy warnings:
+  - rustc_tool.rs: Removed redundant if branches, moved regex outside loop
+  - audit_tool.rs: Collapsed nested if statements
+  - compliance_tool.rs: Removed needless borrow
+  - cargo_tool.rs: Replaced useless format! macro
+
+### Known Issues
+
+- Markdownlint warnings in agent/command documentation (non-blocking)
+
+### Migration Guide
+
+No breaking changes. Existing projects continue to work. To use new features:
+
+1. Run `/init` to set up project configuration
+2. New commands and agents are immediately available
+
+### Performance Characteristics
+
+- **Security Scan Time**: < 5 minutes for typical projects
+- **False Positive Rate**: < 10% target
+- **Agent Response Time**: 2-30 seconds depending on model
+
+### Contributors
+
+- Syntek Studio Development Team
 
 ---
 
 ## Version 0.1.0 (2026-01-10)
 
-**Type**: Initial Release
-**Stability**: Beta
-**Breaking Changes**: N/A (first release)
+**Type**: Initial Release **Stability**: Beta **Breaking Changes**: N/A (first
+release)
 
 ### Summary
 
-First public release of the Syntek Rust Security Plugin, providing comprehensive security tooling and infrastructure agents for Rust development in Claude Code.
+First public release of the Syntek Rust Security Plugin, providing comprehensive
+security tooling and infrastructure agents for Rust development in Claude Code.
 
 ### Technical Details
 
 #### Architecture
+
 - **Total Agents**: 22 (10 security + 12 infrastructure)
 - **Skills**: 4 core security skill modules
 - **Plugin Tools**: 6 Python tools for Rust ecosystem integration

@@ -1,24 +1,77 @@
 # Changelog
 
-All notable changes to the Syntek Rust Security Plugin will be documented in this file.
+All notable changes to the Syntek Rust Security Plugin will be documented in
+this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.2.0] - 2026-01-24
+
+### Added
+
+#### Agents
+
+- 6 new Opus security agents:
+  - encryption-architect: Custom encryption system design
+  - ffi-security-reviewer: FFI boundary security review
+  - network-security-architect: Deep packet inspection design
+  - server-hardener: Infrastructure security hardening
+  - threat-detection-architect: Malware/intrusion detection design
+  - zeroize-auditor: Memory zeroisation verification
+- 22 new infrastructure agents for server stack, AI gateway, and DIY security
+  appliances
+- project-initializer agent for /init command
+
+#### Commands
+
+- /init command for project initialisation
+- 29 new commands for planned features (encryption, vault, infrastructure, AI
+  gateway, server stack, DIY appliances)
+
+#### Skills
+
+- Expanded from 4 to 22 domain knowledge modules
+- New skills for FFI, Vault, AI gateway, server security, and DIY appliances
+- Reorganised skills into directory structure with SKILL.md files
+
+#### Templates
+
+- 32 new project templates covering FFI, infrastructure, AI gateway, and DIY
+  appliances
+
+#### Examples
+
+- Expanded from 100 to 159 compilable Rust examples
+- New examples for AI gateway, server infrastructure, and DIY security
+  appliances
+
+### Changed
+
+- Plugin tools updated to proper Rust doc comment style (//! and ///)
+- Fixed clippy warnings in all plugin tools
+- Reorganised .claude-plugin/ directory structure
+- Updated README with comprehensive agent/command reference
+
+### Fixed
+
+- rustc_tool.rs: Removed redundant if branches, moved regex compilation outside
+  loop
+- audit_tool.rs: Collapsed nested if statements
+- compliance_tool.rs: Removed needless borrow
+- cargo_tool.rs: Replaced useless format! macro
 
 ## [Unreleased]
 
 ### Added
-- Initial plugin structure with 22 specialized agents
-- 10 security agents for Rust threat analysis
-- 12 infrastructure agents for Rust development workflows
-- 4 core skills for security patterns
-- Plugin tools for Rust ecosystem integration
-- Comprehensive templates and examples library
-- Documentation guides for security best practices
+
+- Placeholder for future changes
 
 ## [0.1.0] - 2026-01-10
 
 ### Added
+
 - Initial release of syntek-rust-security plugin
 - Security agents:
   - threat-modeller: STRIDE threat analysis
@@ -82,5 +135,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Threat modelling guide
   - Syntek Dev Suite integration guide
 
-[Unreleased]: https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v0.1.0
+[Unreleased]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.0...HEAD
+[0.2.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.1.0...v0.2.0
+[0.1.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v0.1.0

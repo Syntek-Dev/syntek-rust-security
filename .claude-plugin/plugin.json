@@ -1,6 +1,6 @@
 {
   "name": "syntek-rust-security",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Comprehensive Rust security tooling for Claude Code - threat modeling, vulnerability scanning, cryptographic patterns, and infrastructure security",
   "author": {
     "name": "Syntek Studio",
