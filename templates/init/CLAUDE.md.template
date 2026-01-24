@@ -1,0 +1,164 @@
+# {{project_name}} - Claude Code Configuration
+
+This project is configured with the **Syntek Rust Security** plugin for Claude Code.
+
+## Project Overview
+
+| Field | Value |
+|-------|-------|
+| Package | `{{package_name}}` |
+| Version | `{{version}}` |
+| Edition | `{{edition}}` |
+| MSRV | `{{rust_version}}` |
+| License | `{{license}}` |
+
+{{#if description}}
+**Description**: {{description}}
+{{/if}}
+
+## Security Commands
+
+Run these commands for security analysis:
+
+### Vulnerability & Audit
+- `/vuln-scan` - Scan dependencies for known vulnerabilities (cargo-audit)
+- `/supply-chain-audit` - Analyze supply chain security risks
+- `/scan-secrets` - Detect hardcoded secrets and credentials
+- `/compliance-report` - Generate OWASP/CWE compliance reports
+
+### Code Analysis
+- `/crypto-review` - Review cryptographic implementations
+- `/memory-audit` - Audit unsafe code and memory safety patterns
+- `/review-code` - Security-focused code review
+- `/minimize-unsafe` - Identify and reduce unsafe code
+
+### Threat Modeling
+- `/threat-model` - Perform STRIDE threat analysis
+- `/pentest-tools` - Generate penetration testing tools
+
+### Testing & Fuzzing
+- `/fuzz-setup` - Set up fuzzing infrastructure (cargo-fuzz)
+- `/write-tests` - Generate security-focused tests
+- `/benchmark` - Performance benchmarking
+
+### Infrastructure
+- `/server-harden` - Server security hardening checklist
+- `/docker-harden` - Docker security configuration
+- `/nginx-config` - Security-hardened Nginx configuration
+- `/vault-setup` - HashiCorp Vault integration
+
+## Project Security Considerations
+
+{{#if has_unsafe}}
+### Unsafe Code Detected
+This project contains `unsafe` code blocks. Ensure:
+- Each unsafe block has a `// SAFETY:` comment
+- Invariants are documented and maintained
+- Consider running `/memory-audit` regularly
+{{/if}}
+
+{{#if has_crypto}}
+### Cryptographic Code Detected
+This project uses cryptographic operations. Ensure:
+- Use established libraries (ring, RustCrypto)
+- Never implement custom crypto primitives
+- Use constant-time comparisons for secrets
+- Run `/crypto-review` before releases
+{{/if}}
+
+{{#if has_ffi}}
+### FFI Boundaries Detected
+This project has FFI bindings. Ensure:
+- Validate all data crossing FFI boundaries
+- Handle null pointers and error conditions
+- Document memory ownership clearly
+- Run `/ffi-audit` for security review
+{{/if}}
+
+{{#if has_network}}
+### Network Code Detected
+This project handles network operations. Ensure:
+- Validate and sanitize all inputs
+- Use TLS for sensitive communications
+- Implement proper timeout handling
+- Consider rate limiting and backpressure
+{{/if}}
+
+## Coding Guidelines
+
+### Memory Safety
+1. Prefer safe Rust patterns over unsafe code
+2. Use `#[deny(unsafe_code)]` where possible
+3. Document all unsafe blocks with `// SAFETY:` comments
+4. Use `zeroize` crate for sensitive data cleanup
+
+### Cryptography
+1. Use established libraries: `ring`, `RustCrypto`, `sodiumoxide`
+2. Never roll your own crypto primitives
+3. Use authenticated encryption (AES-GCM, ChaCha20-Poly1305)
+4. Derive keys with Argon2id, scrypt, or PBKDF2
+
+### Dependencies
+1. Run `cargo audit` before each release
+2. Pin dependencies to specific versions
+3. Review new dependencies for security
+4. Use `cargo deny` for license compliance
+
+### Error Handling
+1. Never panic in library code
+2. Use `Result` types for fallible operations
+3. Provide meaningful error messages
+4. Don't leak sensitive information in errors
+
+## Plugin Tools
+
+The `.claude/plugins/` directory contains security analysis tools:
+
+| Tool | Purpose |
+|------|---------|
+| `cargo-tool` | Extract Cargo.toml metadata |
+| `rustc-tool` | Detect Rust toolchain version |
+| `vuln-db-tool` | Manage RustSec advisory database |
+| `audit-tool` | Orchestrate security audits |
+| `fuzzer-tool` | Manage fuzzing infrastructure |
+| `compliance-tool` | Generate compliance reports |
+
+### Building Plugin Tools
+
+```bash
+cd .claude/plugins && cargo build --release
+```
+
+### Tool Locations
+
+After building, tools are available at:
+```
+.claude/plugins/target/release/
+```
+
+## Quick Start
+
+1. **Initial Security Scan**
+   ```
+   /vuln-scan
+   /memory-audit
+   ```
+
+2. **Set Up Fuzzing**
+   ```
+   /fuzz-setup
+   ```
+
+3. **Pre-Release Checklist**
+   ```
+   /vuln-scan
+   /crypto-review
+   /compliance-report
+   ```
+
+## Resources
+
+- [Syntek Rust Security Plugin](https://github.com/Syntek-Studio/syntek-rust-security)
+- [RustSec Advisory Database](https://rustsec.org/)
+- [Rust Security Guidelines](https://anssi-fr.github.io/rust-guide/)
+- [OWASP Rust Security](https://cheatsheetseries.owasp.org/)

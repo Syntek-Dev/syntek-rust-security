@@ -1,0 +1,60 @@
+{
+  "$schema": "https://claude.ai/schemas/settings.json",
+  "plugins": {
+    "syntek-rust-security": {
+      "enabled": true,
+      "version": "0.1.0",
+      "tools_path": ".claude/plugins/target/release",
+      "agents": {
+        "threat-modeller": "opus",
+        "crypto-reviewer": "opus",
+        "vuln-scanner": "sonnet",
+        "memory-safety": "sonnet",
+        "pentester": "opus",
+        "compliance-auditor": "sonnet"
+      }
+    }
+  },
+  "security": {
+    "audit_on_dependency_change": true,
+    "block_known_vulnerable_deps": true,
+    "require_unsafe_justification": true,
+    "warn_on_new_unsafe": true,
+    "scan_secrets_on_commit": true
+  },
+  "rust": {
+    "edition": "{{edition}}",
+    "msrv": "{{rust_version}}",
+    "toolchain": "stable",
+    "clippy": {
+      "enabled": true,
+      "pedantic": true,
+      "nursery": false,
+      "deny_warnings": true
+    },
+    "rustfmt": {
+      "enabled": true,
+      "check_on_save": true
+    }
+  },
+  "analysis": {
+    "auto_threat_model": false,
+    "auto_vuln_scan": true,
+    "auto_memory_audit": false,
+    "scan_interval_hours": 24
+  },
+  "reporting": {
+    "format": "json",
+    "output_dir": ".claude/reports",
+    "include_owasp_mapping": true,
+    "include_cwe_mapping": true,
+    "include_cvss_scores": true
+  },
+  "notifications": {
+    "critical_vulnerabilities": true,
+    "high_vulnerabilities": true,
+    "medium_vulnerabilities": false,
+    "low_vulnerabilities": false,
+    "new_advisories": true
+  }
+}

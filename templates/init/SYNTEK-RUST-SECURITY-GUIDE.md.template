@@ -1,0 +1,633 @@
+# Syntek Rust Security Guide
+
+Comprehensive security guidelines for Rust development. This guide covers memory
+safety, cryptographic patterns, unsafe code practices, and common vulnerability
+prevention.
+
+## Table of Contents
+
+1. [Memory Safety](#memory-safety)
+2. [Cryptographic Guidelines](#cryptographic-guidelines)
+3. [Unsafe Code Practices](#unsafe-code-practices)
+4. [Dependency Security](#dependency-security)
+5. [Input Validation](#input-validation)
+6. [Error Handling](#error-handling)
+7. [Concurrency Safety](#concurrency-safety)
+8. [FFI Security](#ffi-security)
+9. [Common Vulnerabilities](#common-vulnerabilities)
+10. [Compliance Checklist](#compliance-checklist)
+
+---
+
+## Memory Safety
+
+### Ownership and Borrowing
+
+Rust's ownership system prevents memory safety bugs at compile time. Follow these
+patterns:
+
+```rust
+// GOOD: Clear ownership transfer
+fn process_data(data: Vec<u8>) -> Result<(), Error> {
+    // data is owned here, will be dropped at end of scope
+    validate(&data)?;
+    Ok(())
+}
+
+// GOOD: Borrowing for read-only access
+fn validate(data: &[u8]) -> Result<(), Error> {
+    if data.is_empty() {
+        return Err(Error::EmptyInput);
+    }
+    Ok(())
+}
+
+// AVOID: Unnecessary cloning
+fn bad_pattern(data: &Vec<u8>) {
+    let owned = data.clone(); // Unnecessary allocation
+    process(owned);
+}
+```
+
+### Sensitive Data Handling
+
+Use the `zeroize` crate to securely clear sensitive data:
+
+```rust
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
+#[derive(Zeroize, ZeroizeOnDrop)]
+struct SecretKey {
+    bytes: [u8; 32],
+}
+
+// Data is automatically zeroed when dropped
+fn use_key() {
+    let key = SecretKey { bytes: [0u8; 32] };
+    // ... use key ...
+} // key.bytes zeroed here
+
+// For temporary secrets
+fn process_password(password: &str) {
+    let mut password_bytes = password.as_bytes().to_vec();
+    // ... use password_bytes ...
+    password_bytes.zeroize(); // Explicit zeroing
+}
+```
+
+### Preventing Buffer Overflows
+
+```rust
+// GOOD: Use checked indexing
+fn safe_access(data: &[u8], index: usize) -> Option<u8> {
+    data.get(index).copied()
+}
+
+// GOOD: Use iterators instead of manual indexing
+fn process_all(data: &[u8]) {
+    for byte in data {
+        process_byte(*byte);
+    }
+}
+
+// AVOID: Unchecked indexing
+fn unsafe_access(data: &[u8], index: usize) -> u8 {
+    data[index] // Can panic!
+}
+```
+
+---
+
+## Cryptographic Guidelines
+
+### Recommended Libraries
+
+| Purpose | Recommended | Avoid |
+|---------|-------------|-------|
+| General crypto | `ring`, `RustCrypto` | Custom implementations |
+| Password hashing | `argon2`, `scrypt` | `bcrypt` (older), MD5, SHA1 |
+| Symmetric encryption | `aes-gcm`, `chacha20poly1305` | AES-ECB, DES |
+| Asymmetric crypto | `ed25519-dalek`, `x25519-dalek` | RSA < 2048 bits |
+| Random numbers | `rand`, `getrandom` | `rand::thread_rng` for crypto |
+
+### Encryption Patterns
+
+```rust
+use aes_gcm::{
+    aead::{Aead, KeyInit, OsRng},
+    Aes256Gcm, Nonce,
+};
+
+/// Encrypt data using AES-256-GCM
+fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, Error> {
+    let cipher = Aes256Gcm::new_from_slice(key)
+        .map_err(|_| Error::InvalidKey)?;
+
+    // Generate random nonce - NEVER reuse nonces!
+    let mut nonce_bytes = [0u8; 12];
+    getrandom::getrandom(&mut nonce_bytes)?;
+    let nonce = Nonce::from_slice(&nonce_bytes);
+
+    let ciphertext = cipher.encrypt(nonce, plaintext)
+        .map_err(|_| Error::EncryptionFailed)?;
+
+    // Prepend nonce to ciphertext
+    let mut result = nonce_bytes.to_vec();
+    result.extend(ciphertext);
+    Ok(result)
+}
+
+/// Decrypt data using AES-256-GCM
+fn decrypt(key: &[u8; 32], ciphertext: &[u8]) -> Result<Vec<u8>, Error> {
+    if ciphertext.len() < 12 {
+        return Err(Error::InvalidCiphertext);
+    }
+
+    let cipher = Aes256Gcm::new_from_slice(key)
+        .map_err(|_| Error::InvalidKey)?;
+
+    let nonce = Nonce::from_slice(&ciphertext[..12]);
+    let plaintext = cipher.decrypt(nonce, &ciphertext[12..])
+        .map_err(|_| Error::DecryptionFailed)?;
+
+    Ok(plaintext)
+}
+```
+
+### Password Hashing
+
+```rust
+use argon2::{
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2,
+};
+
+/// Hash a password using Argon2id
+fn hash_password(password: &str) -> Result<String, Error> {
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+
+    let hash = argon2.hash_password(password.as_bytes(), &salt)
+        .map_err(|_| Error::HashingFailed)?;
+
+    Ok(hash.to_string())
+}
+
+/// Verify a password against a hash
+fn verify_password(password: &str, hash: &str) -> Result<bool, Error> {
+    let parsed = PasswordHash::new(hash)
+        .map_err(|_| Error::InvalidHash)?;
+
+    Ok(Argon2::default()
+        .verify_password(password.as_bytes(), &parsed)
+        .is_ok())
+}
+```
+
+### Constant-Time Comparisons
+
+```rust
+use subtle::ConstantTimeEq;
+
+/// Compare two byte slices in constant time
+fn secure_compare(a: &[u8], b: &[u8]) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    a.ct_eq(b).into()
+}
+
+// NEVER use regular comparison for secrets
+fn insecure_compare(a: &[u8], b: &[u8]) -> bool {
+    a == b // Timing side-channel!
+}
+```
+
+---
+
+## Unsafe Code Practices
+
+### When to Use Unsafe
+
+Use `unsafe` only when:
+1. Interfacing with C/FFI code
+2. Implementing low-level data structures
+3. Performance-critical code with proven safety
+4. Hardware access in embedded systems
+
+### Documentation Requirements
+
+Every unsafe block MUST have a `// SAFETY:` comment:
+
+```rust
+/// A fixed-size buffer that can be partially filled.
+struct Buffer {
+    data: [MaybeUninit<u8>; 1024],
+    len: usize,
+}
+
+impl Buffer {
+    fn as_slice(&self) -> &[u8] {
+        // SAFETY: We maintain the invariant that `self.data[..self.len]`
+        // is always initialized. This is ensured by:
+        // 1. `len` starts at 0 in `new()`
+        // 2. `push()` only increments `len` after initializing the element
+        // 3. `len` is never modified except through `push()` and `clear()`
+        unsafe {
+            std::slice::from_raw_parts(
+                self.data.as_ptr() as *const u8,
+                self.len,
+            )
+        }
+    }
+}
+```
+
+### Common Unsafe Patterns
+
+```rust
+// GOOD: Minimal unsafe scope
+fn get_unchecked(data: &[u8], index: usize) -> u8 {
+    assert!(index < data.len(), "index out of bounds");
+    // SAFETY: We just verified index is in bounds
+    unsafe { *data.get_unchecked(index) }
+}
+
+// AVOID: Large unsafe blocks
+unsafe fn bad_pattern(data: &[u8]) -> u8 {
+    // Too much code in unsafe block
+    let len = data.len();
+    if len > 0 {
+        let ptr = data.as_ptr();
+        *ptr.add(len - 1)
+    } else {
+        0
+    }
+}
+
+// GOOD: Encapsulate unsafe in safe API
+pub struct SafeWrapper {
+    inner: *mut u8,
+}
+
+impl SafeWrapper {
+    pub fn new() -> Self {
+        // SAFETY: allocating zeroed memory is always safe
+        let ptr = unsafe { alloc_zeroed(Layout::new::<u8>()) };
+        Self { inner: ptr }
+    }
+
+    pub fn get(&self) -> u8 {
+        // SAFETY: inner is always valid due to invariants
+        unsafe { *self.inner }
+    }
+}
+```
+
+---
+
+## Dependency Security
+
+### Auditing Dependencies
+
+Run these checks regularly:
+
+```bash
+# Check for known vulnerabilities
+cargo audit
+
+# Check licenses and bans
+cargo deny check
+
+# Measure unsafe code in dependencies
+cargo geiger
+
+# Verify dependency integrity
+cargo vet
+```
+
+### Cargo.toml Best Practices
+
+```toml
+[dependencies]
+# Pin to specific versions for security-critical deps
+ring = "=0.17.5"
+aes-gcm = "=0.10.3"
+
+# Use version ranges for less critical deps
+serde = "1.0"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+# Minimize features to reduce attack surface
+reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"] }
+```
+
+### deny.toml Configuration
+
+```toml
+[advisories]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "deny"
+
+[licenses]
+allow = ["MIT", "Apache-2.0", "BSD-3-Clause"]
+copyleft = "deny"
+
+[bans]
+multiple-versions = "warn"
+deny = [
+    { name = "openssl" },  # Prefer rustls
+    { name = "native-tls" },
+]
+```
+
+---
+
+## Input Validation
+
+### Validate All External Input
+
+```rust
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ValidationError {
+    #[error("input too long: {0} bytes (max: {1})")]
+    TooLong(usize, usize),
+    #[error("invalid character at position {0}")]
+    InvalidChar(usize),
+    #[error("input cannot be empty")]
+    Empty,
+}
+
+/// Validate and sanitize user input
+pub fn validate_username(input: &str) -> Result<String, ValidationError> {
+    const MAX_LEN: usize = 64;
+
+    if input.is_empty() {
+        return Err(ValidationError::Empty);
+    }
+
+    if input.len() > MAX_LEN {
+        return Err(ValidationError::TooLong(input.len(), MAX_LEN));
+    }
+
+    for (i, c) in input.chars().enumerate() {
+        if !c.is_alphanumeric() && c != '_' && c != '-' {
+            return Err(ValidationError::InvalidChar(i));
+        }
+    }
+
+    Ok(input.to_lowercase())
+}
+```
+
+### Path Traversal Prevention
+
+```rust
+use std::path::{Path, PathBuf};
+
+/// Safely join a user-provided path component
+pub fn safe_path_join(base: &Path, user_input: &str) -> Result<PathBuf, Error> {
+    // Reject absolute paths
+    if Path::new(user_input).is_absolute() {
+        return Err(Error::AbsolutePathNotAllowed);
+    }
+
+    // Reject path traversal attempts
+    if user_input.contains("..") {
+        return Err(Error::PathTraversalDetected);
+    }
+
+    let joined = base.join(user_input);
+    let canonical = joined.canonicalize()?;
+
+    // Verify result is still under base
+    if !canonical.starts_with(base.canonicalize()?) {
+        return Err(Error::PathTraversalDetected);
+    }
+
+    Ok(canonical)
+}
+```
+
+---
+
+## Error Handling
+
+### Don't Leak Sensitive Information
+
+```rust
+// GOOD: Generic error for external callers
+#[derive(Error, Debug)]
+pub enum AuthError {
+    #[error("authentication failed")]
+    Failed,
+}
+
+// Internal error with details for logging
+#[derive(Error, Debug)]
+enum InternalAuthError {
+    #[error("user not found: {0}")]
+    UserNotFound(String),
+    #[error("password mismatch for user: {0}")]
+    PasswordMismatch(String),
+    #[error("account locked: {0}")]
+    AccountLocked(String),
+}
+
+pub fn authenticate(username: &str, password: &str) -> Result<User, AuthError> {
+    match internal_authenticate(username, password) {
+        Ok(user) => Ok(user),
+        Err(e) => {
+            // Log detailed error internally
+            tracing::warn!("Auth failed: {}", e);
+            // Return generic error externally
+            Err(AuthError::Failed)
+        }
+    }
+}
+```
+
+### Use Result, Not Panic
+
+```rust
+// GOOD: Return Result for fallible operations
+pub fn parse_config(input: &str) -> Result<Config, ConfigError> {
+    toml::from_str(input).map_err(ConfigError::Parse)
+}
+
+// AVOID: Panicking in library code
+pub fn bad_parse_config(input: &str) -> Config {
+    toml::from_str(input).expect("invalid config") // Don't do this!
+}
+```
+
+---
+
+## Concurrency Safety
+
+### Avoid Data Races
+
+```rust
+use std::sync::{Arc, RwLock};
+
+/// Thread-safe counter
+pub struct Counter {
+    value: Arc<RwLock<u64>>,
+}
+
+impl Counter {
+    pub fn increment(&self) {
+        let mut guard = self.value.write().unwrap();
+        *guard += 1;
+    }
+
+    pub fn get(&self) -> u64 {
+        *self.value.read().unwrap()
+    }
+}
+
+// For high-performance counters, use atomics
+use std::sync::atomic::{AtomicU64, Ordering};
+
+pub struct AtomicCounter {
+    value: AtomicU64,
+}
+
+impl AtomicCounter {
+    pub fn increment(&self) {
+        self.value.fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub fn get(&self) -> u64 {
+        self.value.load(Ordering::Relaxed)
+    }
+}
+```
+
+---
+
+## FFI Security
+
+### Safe FFI Patterns
+
+```rust
+use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
+
+/// Safe wrapper for C string operations
+pub fn safe_c_string(rust_str: &str) -> Result<CString, Error> {
+    CString::new(rust_str).map_err(|_| Error::NullByteInString)
+}
+
+/// Safe wrapper for receiving C strings
+///
+/// # Safety
+///
+/// The caller must ensure:
+/// - `ptr` is a valid pointer to a null-terminated C string
+/// - The string remains valid for the duration of this call
+/// - The string contains valid UTF-8
+pub unsafe fn from_c_string(ptr: *const c_char) -> Result<String, Error> {
+    if ptr.is_null() {
+        return Err(Error::NullPointer);
+    }
+
+    let c_str = CStr::from_ptr(ptr);
+    c_str.to_str()
+        .map(|s| s.to_owned())
+        .map_err(|_| Error::InvalidUtf8)
+}
+```
+
+---
+
+## Common Vulnerabilities
+
+### CWE-119: Buffer Overflow
+
+```rust
+// VULNERABLE
+fn copy_buffer(src: &[u8], dst: &mut [u8]) {
+    for i in 0..src.len() {
+        dst[i] = src[i]; // Panic if dst is smaller!
+    }
+}
+
+// SAFE
+fn copy_buffer_safe(src: &[u8], dst: &mut [u8]) -> usize {
+    let len = src.len().min(dst.len());
+    dst[..len].copy_from_slice(&src[..len]);
+    len
+}
+```
+
+### CWE-190: Integer Overflow
+
+```rust
+// VULNERABLE (in release mode)
+fn vulnerable_add(a: u32, b: u32) -> u32 {
+    a + b // Wraps silently in release!
+}
+
+// SAFE: Use checked arithmetic
+fn safe_add(a: u32, b: u32) -> Option<u32> {
+    a.checked_add(b)
+}
+
+// SAFE: Use saturating arithmetic
+fn saturating_add(a: u32, b: u32) -> u32 {
+    a.saturating_add(b)
+}
+```
+
+### CWE-416: Use After Free
+
+Rust prevents this at compile time, but watch for:
+- Unsafe code with raw pointers
+- FFI boundaries
+- Self-referential structs
+
+---
+
+## Compliance Checklist
+
+### Pre-Release Security Checklist
+
+- [ ] Run `cargo audit` - no known vulnerabilities
+- [ ] Run `cargo deny check` - licenses and bans pass
+- [ ] Run `cargo clippy -- -D warnings` - no warnings
+- [ ] All unsafe blocks have `// SAFETY:` comments
+- [ ] Cryptographic code reviewed with `/crypto-review`
+- [ ] Input validation on all external boundaries
+- [ ] Error messages don't leak sensitive information
+- [ ] Dependencies pinned for security-critical crates
+- [ ] Fuzzing targets set up for parsers and decoders
+- [ ] CHANGELOG updated with security fixes noted
+
+### OWASP Top 10 for Rust
+
+| OWASP Category | Rust Mitigation |
+|----------------|-----------------|
+| A01 Broken Access Control | Type-safe authorization, newtype patterns |
+| A02 Cryptographic Failures | Use `ring`/RustCrypto, never roll your own |
+| A03 Injection | Type-safe query builders, validate inputs |
+| A04 Insecure Design | Threat modeling, security reviews |
+| A05 Security Misconfiguration | Secure defaults, configuration validation |
+| A06 Vulnerable Components | `cargo audit`, `cargo deny` |
+| A07 Auth Failures | Argon2id for passwords, secure session handling |
+| A08 Data Integrity Failures | Signed updates, integrity checks |
+| A09 Logging Failures | Structured logging, no sensitive data |
+| A10 SSRF | URL validation, allowlists |
+
+---
+
+## Resources
+
+- [Rust Security Guidelines (ANSSI)](https://anssi-fr.github.io/rust-guide/)
+- [RustSec Advisory Database](https://rustsec.org/)
+- [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- [The Rustonomicon](https://doc.rust-lang.org/nomicon/)
+- [Secure Rust Guidelines](https://github.com/nickel-org/nickel/wiki/Security-Guidelines)
