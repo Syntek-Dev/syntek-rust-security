@@ -1,0 +1,14 @@
+{
+  "name": "syntek-rust-security-marketplace",
+  "owner": {
+    "name": "Syntek Studio",
+    "url": "https://github.com/Syntek-Studio/syntek-rust-security"
+  },
+  "plugins": [
+    {
+      "name": "syntek-rust-security",
+      "source": "./",
+      "description": "Comprehensive Rust security tooling for Claude Code - threat modeling, vulnerability scanning, cryptographic patterns, memory-safe development, infrastructure security, and DIY security appliances"
+    }
+  ]
+}
