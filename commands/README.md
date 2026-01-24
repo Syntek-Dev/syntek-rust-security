@@ -1,6 +1,11 @@
 # Syntek Rust Security Commands
 
-This directory contains 22 command markdown files that describe the available commands in the syntek-rust-security plugin.
+This directory contains command markdown files that describe the available
+commands in the syntek-rust-security plugin.
+
+## Setup Commands (1)
+
+1. **init.md** - Initialize a project with the Syntek Rust Security plugin
 
 ## Security Commands (10)
 
@@ -8,7 +13,8 @@ This directory contains 22 command markdown files that describe the available co
 2. **vuln-scan.md** - Vulnerability scanning with cargo-audit and cargo-deny
 3. **crypto-review.md** - Cryptographic implementation review
 4. **memory-audit.md** - Memory safety and unsafe code auditing
-5. **fuzz-setup.md** - Fuzzing infrastructure setup (libFuzzer, AFL++, honggfuzz)
+5. **fuzz-setup.md** - Fuzzing infrastructure setup (libFuzzer, AFL++,
+   honggfuzz)
 6. **scan-secrets.md** - Secret detection in code and git history
 7. **supply-chain-audit.md** - Dependency supply chain security analysis
 8. **pentest-tools.md** - Custom penetration testing tool generation
@@ -48,6 +54,7 @@ Each command file follows this structure:
 The plugin uses two Claude models:
 
 ### Opus Agents (Deep Reasoning)
+
 - threat-model (threat-modeller)
 - crypto-review (crypto-reviewer)
 - pentest-tools (pentester)
@@ -58,6 +65,7 @@ The plugin uses two Claude models:
 - design-api (rust-api-designer)
 
 ### Sonnet Agents (Standard Analysis)
+
 - vuln-scan (vuln-scanner)
 - memory-audit (memory-safety)
 - fuzz-setup (fuzzer)
@@ -84,6 +92,10 @@ Commands are invoked using the plugin namespace:
 For example:
 
 ```bash
+# Initialize the plugin in your project
+/rust-security:init
+
+# Run security scans
 /rust-security:threat-model
 /rust-security:vuln-scan --output=report.json
 /rust-security:crypto-review --target=src/crypto/
@@ -92,6 +104,7 @@ For example:
 ## Documentation
 
 Each command file contains:
+
 - Detailed parameter descriptions
 - Multiple usage examples
 - Best practices and guidelines
