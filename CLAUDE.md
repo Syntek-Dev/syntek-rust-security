@@ -20,6 +20,28 @@ projects. It extends Claude Code with specialized agents for building
 security-focused Rust wrappers, custom encryption/decryption systems,
 memory-safe tooling, and infrastructure security automation.
 
+## Coding Principles
+
+All code in this codebase follows two foundational sets of rules. Read them
+before writing anything: [docs/coding-principles.md](docs/coding-principles.md)
+
+**Rob Pike's 5 Rules (summary)**
+1. Don't guess where bottlenecks are — measure first.
+2. Don't tune for speed until you've measured.
+3. Fancy algorithms are slow when N is small — keep it simple until N is proven large.
+4. Fancy algorithms are buggy and hard to implement — prefer simple, reusable ones.
+5. Data dominates — choose the right data structures and the algorithm becomes obvious.
+
+**Linus Torvalds' Rules (summary)**
+1. Data structures over algorithms — organise your data and the logic follows.
+2. Good taste: remove special cases, simplify logic, reduce branches.
+3. Readability: short functions, descriptive names, avoid deep nesting.
+4. No multiple assignments on one line — one operation, one line.
+5. Favour stability over cleverness.
+6. Make it work first, then make it better — write for the next maintainer.
+
+---
+
 ## Primary Use Cases
 
 This plugin is designed to help create:
