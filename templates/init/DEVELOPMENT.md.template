@@ -1,0 +1,200 @@
+# Development Workflow — {{project_name}}
+
+**Last Updated:** {{current_date}}
+
+Development setup, tooling, testing workflow, and contribution guidelines.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Rust {{rust_version}}+** — Install via [rustup](https://rustup.rs/)
+- **Git** for version control
+- **cargo-audit** — `cargo install cargo-audit`
+- **cargo-deny** — `cargo install cargo-deny`
+- **cargo-fuzz** — `cargo install cargo-fuzz` (for fuzz targets)
+
+### 1. Install Rust
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+rustup override set {{rust_version}}
+rustup component add clippy rustfmt
+```
+
+### 2. Clone and Build
+
+```bash
+git clone <repository-url> {{package_name}}
+cd {{package_name}}
+cargo build --workspace
+```
+
+### 3. Verify Setup
+
+```bash
+cargo test --workspace
+cargo clippy --workspace --all-features -- -D warnings
+cargo fmt --check
+cargo audit
+```
+
+---
+
+## Development Workflow
+
+### Build
+
+```bash
+# Build all crates
+cargo build --workspace
+
+# Build with all features
+cargo build --workspace --all-features
+
+# Release build
+cargo build --release
+```
+
+### Test
+
+```bash
+# All tests
+cargo test --workspace
+
+# Specific crate
+cargo test -p {{package_name}}
+
+# Specific test
+cargo test test_name -- --exact
+
+# With log output
+RUST_LOG=debug cargo test -- --nocapture
+
+# Doc tests
+cargo test --doc
+```
+
+### Code Quality
+
+Run before every commit:
+
+```bash
+# Format
+cargo fmt --all
+
+# Lint (pedantic, warnings as errors)
+cargo clippy --workspace --all-features -- -D warnings -W clippy::pedantic
+
+# Audit dependencies
+cargo audit
+cargo deny check
+```
+
+### Security Scanning
+
+```bash
+/vuln-scan           # Vulnerability scan (cargo-audit + cargo-deny)
+/memory-audit        # Unsafe code and memory safety audit
+/scan-secrets        # Scan for hardcoded credentials
+/supply-chain-audit  # Full dependency security review
+```
+
+---
+
+## Project Structure
+
+```
+{{package_name}}/
+├── src/             # Source code
+├── tests/           # Integration tests
+├── examples/        # Runnable examples
+├── benches/         # Criterion benchmarks
+├── .claude/         # Claude Code configuration
+│   ├── CLAUDE.md
+│   ├── CODING-PRINCIPLES.md
+│   ├── TESTING.md
+│   ├── SECURITY.md
+│   └── DEVELOPMENT.md
+└── Cargo.toml
+```
+
+---
+
+## Git Workflow
+
+**Safety Protocol:**
+- **NEVER** update git config
+- **NEVER** run destructive commands (`push --force`, `reset --hard`, `clean -f`)
+  unless explicitly requested
+- **NEVER** skip hooks (`--no-verify`)
+- **CRITICAL:** Always create NEW commits, never amend
+
+### Creating Commits
+
+```bash
+# Check status and diff before staging
+git status
+git diff
+
+# Stage specific files
+git add src/module.rs tests/module_test.rs
+
+# Commit with Conventional Commits format
+git commit -m "$(cat <<'EOF'
+feat(module): Add feature X for reason Y
+
+Brief explanation of why this change was made.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+EOF
+)"
+```
+
+### Branch Naming
+
+```
+<story-id>/<short-description>
+us042/add-encryption-support
+```
+
+---
+
+## Troubleshooting
+
+### Build Failures
+
+```bash
+cargo clean && cargo build --workspace
+cargo tree -d  # Check conflicting dependencies
+```
+
+### Test Failures
+
+```bash
+# Run single test with full output
+cargo test test_name -- --nocapture --exact
+
+# Run single-threaded to isolate concurrency issues
+cargo test -- --test-threads=1
+```
+
+### Dependency Audit Failures
+
+```bash
+# View advisory details
+cargo audit --json | jq '.vulnerabilities[]'
+
+# Update specific package
+cargo update -p affected-crate
+```
+
+---
+
+## Related Documentation
+
+- **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** — Coding standards
+- **[TESTING.md](TESTING.md)** — Testing guide and patterns
+- **[SECURITY.md](SECURITY.md)** — Security architecture

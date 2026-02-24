@@ -1,0 +1,224 @@
+# Security Architecture — {{project_name}}
+
+**Last Updated:** {{current_date}}
+
+Security patterns, memory safety requirements, and hardening guidelines for
+this project.
+
+---
+
+## Memory Safety and Zeroisation
+{{#if has_crypto}}
+
+All types that hold cryptographic keys, passwords, tokens, or private key
+material must actively zero their memory on drop.
+
+```rust
+use secrecy::Secret;
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
+// Wrap sensitive values to prevent debug/display leakage
+let api_key: Secret<String> = Secret::new(raw_key);
+
+// Custom types holding secrets must derive ZeroizeOnDrop
+#[derive(ZeroizeOnDrop)]
+struct EncryptionKey {
+    bytes: [u8; 32],
+}
+```
+
+**Checklist:**
+- [ ] All cryptographic keys use `ZeroizeOnDrop`
+- [ ] Passwords and tokens wrapped in `secrecy::Secret`
+- [ ] No sensitive values in plain `String` or `Vec<u8>` without a wrapper
+- [ ] `Clone` implementations for sensitive types are also `ZeroizeOnDrop`
+{{/if}}
+{{#if has_unsafe}}
+
+---
+
+## Unsafe Code Requirements
+
+Every `unsafe` block requires a `// SAFETY:` comment explaining why the
+invariants are upheld:
+
+```rust
+// SAFETY: The pointer is valid and aligned because [reason].
+//         The lifetime is correct because [reason].
+unsafe { ... }
+```
+
+Run `cargo geiger` to track the unsafe surface area. Do not increase it
+without justification and peer review.
+{{/if}}
+
+---
+{{#if has_crypto}}
+
+## Cryptographic Standards
+
+### Algorithm Selection
+
+| Use Case             | Required                       | Forbidden                      |
+| -------------------- | ------------------------------ | ------------------------------ |
+| Symmetric encryption | AES-256-GCM, ChaCha20-Poly1305 | AES-128, AES-ECB, RC4, 3DES    |
+| Password hashing     | Argon2id                       | bcrypt alone, MD5, SHA-1       |
+| Key exchange         | X25519                         | RSA < 4096, DH with known params |
+| Digital signatures   | Ed25519                        | RSA-PKCS1, DSA                 |
+| Random nonces        | `OsRng` (cryptographically secure) | `thread_rng`, timestamps   |
+
+### Nonce Management
+
+Never reuse a nonce with the same key. Generate a fresh random nonce for
+every encryption operation.
+
+```rust
+use aes_gcm::{Aes256Gcm, KeyInit, aead::{Aead, OsRng, AeadCore}};
+
+// CORRECT: Fresh random nonce every time
+let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+let ciphertext = cipher.encrypt(&nonce, plaintext)?;
+// Store as: nonce || ciphertext
+```
+
+### Constant-Time Comparisons
+
+All comparisons involving secrets must be constant-time:
+
+```rust
+use subtle::ConstantTimeEq;
+
+// CORRECT
+let is_valid = candidate_mac.ct_eq(&expected_mac).into();
+
+// WRONG — leaks timing information
+// let is_valid = candidate_mac == expected_mac;
+```
+
+---
+{{/if}}
+
+## Secrets Management
+
+All secrets are retrieved from HashiCorp Vault at runtime. No secrets are
+stored in environment variables, configuration files, or code.
+
+```rust
+// Fetch secrets at startup — fail fast if unavailable
+let secret = vault_client.kv_get("secret/data/api-key")
+    .await
+    .context("failed to fetch API key from Vault")?;
+```
+
+**Rules:**
+- Use short-lived Vault tokens (TTL ≤ 1 hour for service tokens)
+- Renew tokens before expiry; fail gracefully if renewal fails
+- Revoke tokens on service shutdown
+- Never log Vault tokens
+
+---
+
+## Dependency Security
+
+```bash
+# Audit against RustSec advisory database
+cargo audit
+
+# Enforce licence and dependency policies
+cargo deny check
+
+# Scan unsafe code surface area
+cargo geiger --all-features
+```
+
+**Before adding any dependency:**
+1. Check the RustSec advisory database: `cargo audit`
+2. Verify active maintenance and security track record
+3. Confirm licence compatibility (MIT, Apache 2.0, MPL 2.0)
+4. Pin to a specific version in `Cargo.toml`
+
+---
+
+## Input Validation
+
+Treat all external input as hostile — network data, files, environment
+variables, FFI arguments, and CLI arguments.
+
+```rust
+// Validate at the boundary before the value enters the system
+fn parse_and_validate(raw: &str) -> Result<ValidatedInput, ValidationError> {
+    if raw.contains("..") {
+        return Err(ValidationError::PathTraversal);
+    }
+    if raw.len() > MAX_INPUT_LEN {
+        return Err(ValidationError::TooLong);
+    }
+    Ok(ValidatedInput(raw.to_string()))
+}
+```
+
+Use the newtype pattern to enforce that validation has occurred:
+
+```rust
+pub struct ValidatedInput(String);  // Cannot be constructed without validation
+```
+{{#if has_network}}
+
+---
+
+## Transport Security
+
+All outbound connections use TLS 1.2 or higher. Use `rustls` rather than
+OpenSSL defaults. Never disable certificate verification.
+
+```rust
+// WRONG — disables all certificate validation
+// config.dangerous().with_custom_certificate_verifier(Arc::new(NoVerifier));
+
+// CORRECT — use proper certificate verification
+let tls_config = ClientConfig::builder()
+    .with_root_certificates(root_store)
+    .with_no_client_auth();
+```
+
+For test environments with self-signed certificates, add the test CA to the
+trust store rather than disabling verification.
+{{/if}}
+
+---
+
+## Security Scanning Commands
+
+```bash
+# Vulnerability scan
+/vuln-scan
+
+# Review cryptographic implementations
+/crypto-review
+
+# Audit unsafe code
+/memory-audit
+
+# Scan for hardcoded secrets
+/scan-secrets
+
+# Supply chain audit
+/supply-chain-audit
+
+# Generate compliance report
+/compliance-report
+```
+
+---
+
+## Code Review Security Checklist
+
+Before merging any change:
+
+- [ ] No hardcoded secrets, API keys, or credentials
+- [ ] All external input validated at the boundary
+- [ ] Sensitive types use `secrecy::Secret` and `ZeroizeOnDrop`
+- [ ] `unsafe` blocks have `// SAFETY:` comments
+- [ ] Constant-time comparison used for secret values
+- [ ] No new dependency added without security review
+- [ ] `cargo audit` passes with no unresolved advisories

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Locates and runs the vuln-db-tool binary, building it first if not present.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
+BINARY="$PLUGIN_DIR/target/release/vuln-db-tool"
+
+if [ ! -f "$BINARY" ]; then
+    echo "[syntek-rust-security] Building plugin tools..." >&2
+    cargo build --release --manifest-path "$PLUGIN_DIR/Cargo.toml" >&2
+fi
+
+exec "$BINARY" "$@"

@@ -80,6 +80,47 @@ Substitutions:
 - `{{has_ffi}}` - Boolean for conditional sections
 - `{{has_network}}` - Boolean for conditional sections
 
+The generated CLAUDE.md must include a Required Reading table linking to all
+four documents: CODING-PRINCIPLES.md, TESTING.md, SECURITY.md, DEVELOPMENT.md.
+
+#### CODING-PRINCIPLES.md
+
+Use template: `templates/init/CODING-PRINCIPLES.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_unsafe}}` - Include unsafe code section if true
+- `{{has_crypto}}` - Include cryptography section if true
+- `{{has_ffi}}` - Include FFI boundary section if true
+
+#### TESTING.md
+
+Use template: `templates/init/TESTING.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_ffi}}` - Include FFI boundary tests section if true
+- `{{has_network}}` - Include wiremock HTTP mocking section if true
+- `{{has_crypto}}` - Include security-critical proptest section if true
+
+#### SECURITY.md
+
+Use template: `templates/init/SECURITY.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_crypto}}` - Include cryptographic standards section if true
+- `{{has_ffi}}` - Include FFI boundary security section if true
+- `{{has_network}}` - Include transport security section if true
+
+#### DEVELOPMENT.md
+
+Use template: `templates/init/DEVELOPMENT.md.template`
+
+Substitutions:
+
+- `{{project_name}}` - Package name
+- `{{rust_version}}` - MSRV or "1.92.0"
+
+No feature-flag conditionals — DEVELOPMENT.md is always the full document.
+
 #### SYNTEK-RUST-SECURITY-GUIDE.md
 
 Copy from: `templates/init/SYNTEK-RUST-SECURITY-GUIDE.md.template`
@@ -136,6 +177,10 @@ MSRV: {rust_version}
 
 Created files:
   .claude/CLAUDE.md
+  .claude/CODING-PRINCIPLES.md
+  .claude/TESTING.md
+  .claude/SECURITY.md
+  .claude/DEVELOPMENT.md
   .claude/SYNTEK-RUST-SECURITY-GUIDE.md
   .claude/settings.local.json
   .claude/plugins/Cargo.toml
@@ -156,9 +201,11 @@ Detected characteristics:
 
 Next steps:
   1. Review .claude/CLAUDE.md and customize as needed
-  2. Run /vuln-scan to check for vulnerabilities
-  3. Run /memory-audit to analyze unsafe code
-  4. Commit .claude/ to version control
+  2. Review .claude/CODING-PRINCIPLES.md and adapt to project conventions
+  3. Review .claude/SECURITY.md and customise for project-specific threats
+  4. Run /vuln-scan to check for vulnerabilities
+  5. Run /memory-audit to analyze unsafe code
+  6. Commit .claude/ to version control
 ```
 
 ## Error Handling
@@ -226,6 +273,10 @@ Error details:
 | Source                                                  | Destination                             |
 | ------------------------------------------------------- | --------------------------------------- |
 | `templates/init/CLAUDE.md.template`                     | `.claude/CLAUDE.md`                     |
+| `templates/init/CODING-PRINCIPLES.md.template`          | `.claude/CODING-PRINCIPLES.md`          |
+| `templates/init/TESTING.md.template`                    | `.claude/TESTING.md`                    |
+| `templates/init/SECURITY.md.template`                   | `.claude/SECURITY.md`                   |
+| `templates/init/DEVELOPMENT.md.template`                | `.claude/DEVELOPMENT.md`                |
 | `templates/init/SYNTEK-RUST-SECURITY-GUIDE.md.template` | `.claude/SYNTEK-RUST-SECURITY-GUIDE.md` |
 | `templates/init/settings.local.json.template`           | `.claude/settings.local.json`           |
 | `plugins/Cargo.toml`                                    | `.claude/plugins/Cargo.toml`            |

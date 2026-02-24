@@ -7,6 +7,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Placeholder for future changes
+
+## [0.2.1] - 24/02/2026
+
+### Added
+
+- `plugins/bin/` directory with 6 shell wrapper scripts (cargo-tool, rustc-tool,
+  vuln-db-tool, audit-tool, fuzzer-tool, compliance-tool)
+- Each wrapper script dynamically resolves the compiled Rust binary path relative
+  to its own location and auto-builds the binary if not present
+- `docs` subcommand to all 6 plugin tools — discovers the four required project
+  documentation files by searching `.claude/` then the project root
+
+### Fixed
+
+- `config.json` plugin tool scripts corrected from non-existent `plugins/<name>.py`
+  Python paths to the correct `plugins/bin/<name>` shell wrapper paths
+- Plugin tools are now portable and work on any device without hardcoded absolute
+  paths
+
+### Changed
+
+- `config.json` version bumped from `0.1.0` to `0.2.1`
+- `CLAUDE.md` version metadata updated to `0.2.1`
+- `agents/setup/project-initializer.md` updated to reference new doc file
+  templates and the Required Reading table in CLAUDE.md
+- `commands/init.md` updated with improved project initialisation behaviour
+- All 6 plugin Rust tools (`cargo_tool.rs`, `rustc_tool.rs`, `audit_tool.rs`,
+  `vuln_db_tool.rs`, `fuzzer_tool.rs`, `compliance_tool.rs`) updated with `docs`
+  subcommand support
+
 ## [0.2.0] - 2026-01-24
 
 ### Added
@@ -61,12 +96,6 @@ and this project adheres to
 - audit_tool.rs: Collapsed nested if statements
 - compliance_tool.rs: Removed needless borrow
 - cargo_tool.rs: Replaced useless format! macro
-
-## [Unreleased]
-
-### Added
-
-- Placeholder for future changes
 
 ## [0.1.0] - 2026-01-10
 
@@ -136,7 +165,9 @@ and this project adheres to
   - Syntek Dev Suite integration guide
 
 [Unreleased]:
-  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.0...HEAD
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.1...HEAD
+[0.2.1]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.0...v0.2.1
 [0.2.0]:
   https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.1.0...v0.2.0
 [0.1.0]:

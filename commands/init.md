@@ -21,6 +21,10 @@ creating a `.claude/` directory with the following structure:
 ```
 .claude/
 ├── CLAUDE.md                      # Project-specific Claude instructions
+├── CODING-PRINCIPLES.md           # Coding standards and principles
+├── TESTING.md                     # Testing guide and patterns
+├── SECURITY.md                    # Security architecture and guidelines
+├── DEVELOPMENT.md                 # Development workflow
 ├── SYNTEK-RUST-SECURITY-GUIDE.md  # Security guidelines and patterns
 ├── settings.local.json            # Local Claude Code settings
 └── plugins/
@@ -49,11 +53,37 @@ creating a `.claude/` directory with the following structure:
 
 3. **Generate CLAUDE.md** Create project-specific instructions with:
    - Project name and description from Cargo.toml
+   - References to all four required documents
    - Available security commands
    - Project-specific security considerations
    - Links to examples and documentation
 
-4. **Generate SYNTEK-RUST-SECURITY-GUIDE.md** Create security guidelines
+4. **Generate CODING-PRINCIPLES.md** Create coding standards covering:
+   - Rob Pike's 5 Rules and Linus Torvalds' principles
+   - Rust-specific naming conventions and code structure
+   - Error handling, unsafe code, and logging requirements
+   - File length limits and DRY/WET rule of three
+
+5. **Generate TESTING.md** Create testing guide covering:
+   - Test tooling (cargo test, mockall, wiremock, proptest, cargo-fuzz)
+   - Directory structure for unit, integration, and fuzz tests
+   - TDD methodology and mocking patterns
+   - Security-critical testing requirements
+
+6. **Generate SECURITY.md** Create security guide covering:
+   - Memory safety and zeroisation patterns (zeroize, secrecy)
+   - Cryptographic standards and algorithm selection
+   - Secrets management via HashiCorp Vault
+   - Dependency security and supply chain management
+   - Input validation and transport security
+
+7. **Generate DEVELOPMENT.md** Create development guide covering:
+   - Prerequisites and toolchain setup
+   - Local build and test workflow
+   - Security scanning commands
+   - Git conventions and release process
+
+8. **Generate SYNTEK-RUST-SECURITY-GUIDE.md** Create security guidelines
    covering:
    - Memory safety patterns
    - Cryptographic best practices
@@ -61,22 +91,34 @@ creating a `.claude/` directory with the following structure:
    - Dependency security
    - Common vulnerability patterns
 
-5. **Generate settings.local.json** Configure Claude Code with:
+9. **Generate settings.local.json** Configure Claude Code with:
    - Plugin path references
    - Security-focused default behaviors
    - Tool permissions
 
-6. **Copy Plugin Tools** Copy the Rust plugin tools from the
+10. **Copy Plugin Tools** Copy the Rust plugin tools from the
    syntek-rust-security repository:
    - All `*.rs` files from `plugins/src/`
    - `Cargo.toml` for the plugin tools
 
-7. **Build Plugin Tools (Optional)**
+11. **Build Plugin Tools (Optional)**
    ```bash
    cd .claude/plugins && cargo build --release
    ```
 
 ## Generated Files
+
+### Required Documents
+
+All four required documents are generated from the plugin's templates and
+adapted for the target project's characteristics:
+
+| File | Template Source | Purpose |
+| ---- | --------------- | ------- |
+| `CODING-PRINCIPLES.md` | `templates/init/CODING-PRINCIPLES.md.template` | Coding standards |
+| `TESTING.md` | `templates/init/TESTING.md.template` | Testing guide |
+| `SECURITY.md` | `templates/init/SECURITY.md.template` | Security architecture |
+| `DEVELOPMENT.md` | `templates/init/DEVELOPMENT.md.template` | Development workflow |
 
 ### CLAUDE.md Template
 
@@ -89,6 +131,17 @@ This is a Rust project configured with the Syntek Rust Security plugin.
 
 **Package**: {package_name} **Version**: {version} **Edition**: {edition}
 **MSRV**: {rust_version}
+
+## Required Reading
+
+All agents must read these four documents before writing or reviewing any code:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[TESTING.md](TESTING.md)** | Testing guide, patterns, and examples |
+| **[SECURITY.md](SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Development workflow, tooling, git conventions |
 
 ## Security Commands
 
@@ -104,14 +157,6 @@ Run these commands for security analysis:
 ## Project Security Considerations
 
 {auto_detected_considerations}
-
-## Coding Guidelines
-
-1. Prefer safe Rust patterns over unsafe code
-2. Use established cryptographic libraries (ring, RustCrypto)
-3. Validate all external inputs
-4. Use `zeroize` for sensitive data
-5. Keep dependencies updated and audited
 
 ## Plugin Tools
 
@@ -182,7 +227,9 @@ After running `/init`:
 
 1. **Review Generated Files**
    - Check `.claude/CLAUDE.md` for accuracy
-   - Customize security guidelines as needed
+   - Review `.claude/CODING-PRINCIPLES.md` and adapt to project conventions
+   - Review `.claude/SECURITY.md` and customise for project-specific threats
+   - Review `.claude/DEVELOPMENT.md` and update prerequisites as needed
 
 2. **Build Plugin Tools**
 
@@ -195,6 +242,7 @@ After running `/init`:
    ```bash
    claude /vuln-scan
    claude /memory-audit
+   claude /supply-chain-audit
    ```
 
 4. **Commit to Version Control**

@@ -1,12 +1,12 @@
 {
   "name": "syntek-rust-security",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Rust security tooling plugin for Claude Code",
   "pluginTools": [
     {
       "name": "cargo-tool",
       "description": "Extract Cargo project metadata and analyze dependencies",
-      "script": "plugins/cargo-tool.py",
+      "script": "plugins/bin/cargo-tool",
       "commands": {
         "info": "Get project metadata from Cargo.toml",
         "deps": "Analyze dependency tree",
@@ -18,7 +18,7 @@
     {
       "name": "rustc-tool",
       "description": "Detect Rust toolchain version and configuration",
-      "script": "plugins/rustc-tool.py",
+      "script": "plugins/bin/rustc-tool",
       "commands": {
         "version": "Get rustc version",
         "target": "Get target triple",
@@ -29,7 +29,7 @@
     {
       "name": "vuln-db-tool",
       "description": "Manage RustSec vulnerability database",
-      "script": "plugins/vuln-db-tool.py",
+      "script": "plugins/bin/vuln-db-tool",
       "commands": {
         "update": "Update vulnerability database",
         "search": "Search for CVEs",
@@ -39,7 +39,7 @@
     {
       "name": "audit-tool",
       "description": "Orchestrate security audits using cargo-audit, cargo-deny, and cargo-geiger",
-      "script": "plugins/audit-tool.py",
+      "script": "plugins/bin/audit-tool",
       "commands": {
         "run": "Run comprehensive security audit",
         "quick": "Run quick security scan",
@@ -49,7 +49,7 @@
     {
       "name": "fuzzer-tool",
       "description": "Manage fuzzing infrastructure (libfuzzer, AFL++, honggfuzz)",
-      "script": "plugins/fuzzer-tool.py",
+      "script": "plugins/bin/fuzzer-tool",
       "commands": {
         "init": "Initialize fuzzing infrastructure",
         "run": "Start fuzzing campaign",
@@ -60,7 +60,7 @@
     {
       "name": "compliance-tool",
       "description": "Generate compliance reports (OWASP, CWE, CVSS)",
-      "script": "plugins/compliance-tool.py",
+      "script": "plugins/bin/compliance-tool",
       "commands": {
         "owasp": "Generate OWASP compliance report",
         "cwe": "Map vulnerabilities to CWE categories",

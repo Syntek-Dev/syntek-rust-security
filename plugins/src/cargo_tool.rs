@@ -11,6 +11,7 @@
 //! - `targets` - List compilation targets (bins, libs, examples, tests, benches)
 //! - `features` - List available feature flags and their dependencies
 //! - `unsafe` - Scan for unsafe code blocks across the project
+//! - `docs` - Show paths to required project documentation files
 
 use anyhow::{Context, Result};
 use cargo_metadata::{CargoOpt, Metadata, MetadataCommand, Package};
@@ -60,6 +61,12 @@ enum Commands {
         /// Show detailed locations
         #[arg(long)]
         detailed: bool,
+    },
+    /// Show paths to required project documentation files
+    Docs {
+        /// Search from a specific directory instead of the current working directory
+        #[arg(long)]
+        base: Option<PathBuf>,
     },
 }
 
@@ -144,6 +151,24 @@ struct UnsafeInfo {
     locations: Vec<UnsafeLocation>,
 }
 
+/// Paths to the four required project documentation files.
+///
+/// Files are discovered by searching `.claude/` then the project root.
+/// A `None` value means the file was not found in any search location.
+#[derive(Serialize, Deserialize)]
+struct DocFiles {
+    /// Path to CODING-PRINCIPLES.md, or null if not found.
+    coding_principles: Option<String>,
+    /// Path to TESTING.md, or null if not found.
+    testing: Option<String>,
+    /// Path to SECURITY.md, or null if not found.
+    security: Option<String>,
+    /// Path to DEVELOPMENT.md, or null if not found.
+    development: Option<String>,
+    /// Directories that were searched, in priority order.
+    searched_dirs: Vec<String>,
+}
+
 /// Location of an unsafe code block.
 #[derive(Serialize, Deserialize)]
 struct UnsafeLocation {
@@ -164,6 +189,7 @@ fn main() -> Result<()> {
         Commands::Targets => handle_targets(cli.manifest_path)?,
         Commands::Features => handle_features(cli.manifest_path)?,
         Commands::Unsafe { detailed } => handle_unsafe(cli.manifest_path, detailed)?,
+        Commands::Docs { base } => handle_docs(base)?,
     };
 
     println!("{}", serde_json::to_string_pretty(&result)?);
@@ -335,6 +361,55 @@ fn handle_unsafe(manifest_path: Option<PathBuf>, detailed: bool) -> Result<serde
     };
 
     Ok(serde_json::to_value(unsafe_info)?)
+}
+
+/// Reports the discovered paths of the four required documentation files.
+///
+/// Searches in priority order: `.claude/` subdirectory, then the base directory
+/// itself. Works on any device regardless of how the plugin was installed.
+fn handle_docs(base: Option<PathBuf>) -> Result<serde_json::Value> {
+    let doc_files = discover_doc_files(base);
+    Ok(serde_json::to_value(doc_files)?)
+}
+
+/// Discovers the four required documentation files starting from `base`.
+///
+/// Search order (first match wins for each file):
+/// 1. `<base>/.claude/<file>`  — files placed by `/init` in a target project
+/// 2. `<base>/<file>`          — files at the project root
+///
+/// The base defaults to the current working directory when `None` is passed.
+fn discover_doc_files(base: Option<PathBuf>) -> DocFiles {
+    let base_dir = base.unwrap_or_else(|| {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    });
+
+    let search_dirs = vec![
+        base_dir.join(".claude"),
+        base_dir.clone(),
+    ];
+
+    let searched_dirs: Vec<String> = search_dirs
+        .iter()
+        .map(|p| p.to_string_lossy().into_owned())
+        .collect();
+
+    DocFiles {
+        coding_principles: find_doc_file(&search_dirs, "CODING-PRINCIPLES.md"),
+        testing: find_doc_file(&search_dirs, "TESTING.md"),
+        security: find_doc_file(&search_dirs, "SECURITY.md"),
+        development: find_doc_file(&search_dirs, "DEVELOPMENT.md"),
+        searched_dirs,
+    }
+}
+
+/// Returns the path of the first location where `filename` exists, or `None`.
+fn find_doc_file(search_dirs: &[PathBuf], filename: &str) -> Option<String> {
+    search_dirs
+        .iter()
+        .map(|dir| dir.join(filename))
+        .find(|path| path.exists())
+        .map(|path| path.to_string_lossy().into_owned())
 }
 
 /// Retrieves cargo metadata for the project

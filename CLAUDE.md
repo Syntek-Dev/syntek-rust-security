@@ -5,7 +5,7 @@ This file configures the Syntek Rust Security Plugin for Claude Code.
 ## Plugin Metadata
 
 - **Name**: syntek-rust-security
-- **Version**: 0.1.0
+- **Version**: 0.2.1
 - **Type**: Security & Development Tools
 - **Language**: Rust
 - **Rust Version**: 1.92.0+ (released December 2025)
@@ -20,10 +20,21 @@ projects. It extends Claude Code with specialized agents for building
 security-focused Rust wrappers, custom encryption/decryption systems,
 memory-safe tooling, and infrastructure security automation.
 
+## Required Reading
+
+All agents must read these four documents before writing or reviewing any code:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code, crypto, logging |
+| **[TESTING.md](TESTING.md)** | Testing guide, patterns, and examples for Rust security projects |
+| **[SECURITY.md](SECURITY.md)** | Memory safety, cryptographic standards, secrets management, hardening |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Development workflow, tooling, git conventions, release process |
+
 ## Coding Principles
 
-All code in this codebase follows two foundational sets of rules. Read them
-before writing anything: [docs/coding-principles.md](docs/coding-principles.md)
+All code in this codebase follows two foundational sets of rules. Full details
+in **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)**.
 
 **Rob Pike's 5 Rules (summary)**
 1. Don't guess where bottlenecks are — measure first.

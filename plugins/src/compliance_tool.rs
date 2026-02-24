@@ -10,6 +10,7 @@
 //! - `cwe` - Map vulnerabilities to CWE (Common Weakness Enumeration)
 //! - `cvss` - Calculate CVSS scores for vulnerabilities
 //! - `export` - Generate compliance reports in JSON/Markdown format
+//! - `docs` - Show paths to required project documentation files
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -65,6 +66,30 @@ enum Commands {
         #[arg(long)]
         full: bool,
     },
+    /// Show paths to required project documentation files
+    Docs {
+        /// Search from a specific directory instead of the current working directory
+        #[arg(long)]
+        base: Option<PathBuf>,
+    },
+}
+
+/// Paths to the four required project documentation files.
+///
+/// Files are discovered by searching `.claude/` then the project root.
+/// A `None` value means the file was not found in any search location.
+#[derive(Serialize, Deserialize)]
+struct DocFiles {
+    /// Path to CODING-PRINCIPLES.md, or null if not found.
+    coding_principles: Option<String>,
+    /// Path to TESTING.md, or null if not found.
+    testing: Option<String>,
+    /// Path to SECURITY.md, or null if not found.
+    security: Option<String>,
+    /// Path to DEVELOPMENT.md, or null if not found.
+    development: Option<String>,
+    /// Directories that were searched, in priority order.
+    searched_dirs: Vec<String>,
 }
 
 /// OWASP Top 10 vulnerability mapping result.
@@ -210,6 +235,7 @@ fn main() -> Result<()> {
         Commands::Cwe { detailed } => handle_cwe(cli.input, detailed)?,
         Commands::Cvss { version } => handle_cvss(cli.input, version)?,
         Commands::Export { output, full } => handle_export(cli.input, output, full)?,
+        Commands::Docs { base } => handle_docs(base)?,
     };
 
     if cli.format == "markdown" {
@@ -219,6 +245,50 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Reports the discovered paths of the four required documentation files.
+fn handle_docs(base: Option<PathBuf>) -> Result<serde_json::Value> {
+    let doc_files = discover_doc_files(base);
+    Ok(serde_json::to_value(doc_files)?)
+}
+
+/// Discovers the four required documentation files starting from `base`.
+///
+/// Search order (first match wins for each file):
+/// 1. `<base>/.claude/<file>`  — files placed by `/init` in a target project
+/// 2. `<base>/<file>`          — files at the project root
+fn discover_doc_files(base: Option<PathBuf>) -> DocFiles {
+    let base_dir = base.unwrap_or_else(|| {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    });
+
+    let search_dirs = vec![
+        base_dir.join(".claude"),
+        base_dir.clone(),
+    ];
+
+    let searched_dirs: Vec<String> = search_dirs
+        .iter()
+        .map(|p| p.to_string_lossy().into_owned())
+        .collect();
+
+    DocFiles {
+        coding_principles: find_doc_file(&search_dirs, "CODING-PRINCIPLES.md"),
+        testing: find_doc_file(&search_dirs, "TESTING.md"),
+        security: find_doc_file(&search_dirs, "SECURITY.md"),
+        development: find_doc_file(&search_dirs, "DEVELOPMENT.md"),
+        searched_dirs,
+    }
+}
+
+/// Returns the path of the first location where `filename` exists, or `None`.
+fn find_doc_file(search_dirs: &[PathBuf], filename: &str) -> Option<String> {
+    search_dirs
+        .iter()
+        .map(|dir| dir.join(filename))
+        .find(|path| path.exists())
+        .map(|path| path.to_string_lossy().into_owned())
 }
 
 /// Maps vulnerabilities to OWASP Top 10
