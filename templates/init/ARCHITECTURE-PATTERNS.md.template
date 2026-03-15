@@ -1,0 +1,445 @@
+# Architecture Patterns — {{project_name}}
+
+**Last Updated:** {{current_date}}
+**Version:** 1.0.0
+**Maintained By:** Development Team
+
+Architectural patterns, project structure, and design conventions for this
+project.
+
+---
+
+## Core Principle
+
+Organise code around the domain, not the framework. The framework (Axum,
+Tokio) is a delivery mechanism; business logic must be independently testable
+without it.
+
+---
+{{#if has_web}}
+
+## Service Layer
+
+Define domain operations as traits. This makes services injectable, testable
+with mock implementations, and decoupled from the HTTP layer.
+
+```rust
+use async_trait::async_trait;
+
+#[async_trait]
+pub trait UserService: Send + Sync {
+    async fn get_user(&self, id: UserId) -> Result<User, ServiceError>;
+    async fn create_user(&self, cmd: CreateUserCommand) -> Result<User, ServiceError>;
+    async fn delete_user(&self, id: UserId) -> Result<(), ServiceError>;
+}
+
+pub struct UserServiceImpl {
+    repo: Arc<dyn UserRepository>,
+}
+
+#[async_trait]
+impl UserService for UserServiceImpl {
+    async fn get_user(&self, id: UserId) -> Result<User, ServiceError> {
+        self.repo
+            .find_by_id(id)
+            .await?
+            .ok_or(ServiceError::NotFound)
+    }
+
+    async fn create_user(&self, cmd: CreateUserCommand) -> Result<User, ServiceError> {
+        validate_create_user_command(&cmd)?;
+        let user = User::new(cmd);
+        self.repo.save(&user).await?;
+        Ok(user)
+    }
+
+    async fn delete_user(&self, id: UserId) -> Result<(), ServiceError> {
+        self.repo.delete(id).await
+    }
+}
+```
+
+**Rules:**
+- Services contain domain logic only — no HTTP, no SQL, no serialisation
+- One service per domain aggregate
+- Services accept command/query objects, not raw strings or HTTP types
+
+---
+
+## Repository Pattern
+
+Abstract database access behind a trait. The service layer depends on the
+trait; the concrete implementation uses `sqlx` or another driver.
+
+```rust
+use async_trait::async_trait;
+
+#[async_trait]
+pub trait UserRepository: Send + Sync {
+    async fn find_by_id(&self, id: UserId) -> Result<Option<User>, RepositoryError>;
+    async fn save(&self, user: &User) -> Result<(), RepositoryError>;
+    async fn delete(&self, id: UserId) -> Result<(), RepositoryError>;
+}
+
+pub struct SqlxUserRepository {
+    pool: sqlx::PgPool,
+}
+
+#[async_trait]
+impl UserRepository for SqlxUserRepository {
+    async fn find_by_id(&self, id: UserId) -> Result<Option<User>, RepositoryError> {
+        sqlx::query_as!(
+            UserRow,
+            "SELECT id, name, created_at FROM users WHERE id = $1 AND deleted_at IS NULL",
+            id.0
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(RepositoryError::Database)
+        .map(|row| row.map(User::from))
+    }
+
+    // ...
+}
+```
+
+---
+
+## AppState Pattern
+
+Share state across Axum handlers via `Arc<AppState>`. Use `axum::extract::State`
+to extract it in handlers.
+
+```rust
+use std::sync::Arc;
+
+pub struct AppState {
+    pub users: Arc<dyn UserService>,
+    pub config: Arc<Config>,
+    // Add other shared services here
+}
+
+impl AppState {
+    pub fn new(config: Config, pool: sqlx::PgPool) -> Arc<Self> {
+        let user_repo = Arc::new(SqlxUserRepository { pool });
+        let users = Arc::new(UserServiceImpl { repo: user_repo });
+
+        Arc::new(AppState {
+            users: users as Arc<dyn UserService>,
+            config: Arc::new(config),
+        })
+    }
+}
+
+// In a handler:
+pub async fn get_user(
+    State(state): State<Arc<AppState>>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, ApiError> {
+    let user_id = UserId::parse(&id).map_err(|_| ApiError::Validation {
+        field: "id".to_string(),
+        message: "invalid user ID format".to_string(),
+    })?;
+    let user = state.users.get_user(user_id).await?;
+    Ok(Json(ApiResponse { data: user }))
+}
+```
+
+---
+
+## Middleware Pipeline
+
+Use tower `ServiceBuilder` to compose middleware. Order matters — outer layers
+execute first on ingress and last on egress.
+
+```rust
+use tower::ServiceBuilder;
+use tower_http::trace::TraceLayer;
+
+let app = build_router(state)
+    .layer(
+        ServiceBuilder::new()
+            .layer(TraceLayer::new_for_http())
+            // Auth middleware (inner — runs after tracing)
+            .layer(middleware::from_fn_with_state(state.clone(), require_auth)),
+    );
+```
+
+**Middleware order (outer → inner):**
+
+1. Request ID assignment
+2. Structured tracing/logging
+3. CORS
+4. Authentication
+5. Rate limiting
+6. Request body size limits
+
+---
+{{/if}}
+
+## Background Tasks
+
+Use `tokio::spawn` for lightweight async tasks. Use
+`tokio::task::spawn_blocking` for CPU-heavy work or blocking I/O that would
+stall the async executor.
+
+```rust
+use tokio::time::{interval, Duration};
+
+// Lightweight periodic async task
+pub fn start_token_renewal_task(vault: Arc<dyn VaultClient>) {
+    tokio::spawn(async move {
+        let mut ticker = interval(Duration::from_secs(600));
+        loop {
+            ticker.tick().await;
+            if let Err(err) = vault.renew_token().await {
+                tracing::error!(error = %err, "vault token renewal failed");
+            }
+        }
+    });
+}
+
+// CPU-heavy work — offload to the blocking thread pool
+pub async fn hash_password(password: String) -> Result<String, HashError> {
+    tokio::task::spawn_blocking(move || {
+        argon2_hash(&password)
+    })
+    .await
+    .map_err(|_| HashError::TaskPanicked)?
+}
+```
+
+**Rules:**
+- Never block the async executor with `std::thread::sleep`, synchronous file I/O,
+  or CPU-heavy computation
+- Store task `JoinHandle`s in `AppState` if you need to cancel them on shutdown
+- Log all task panics — `tokio::spawn` silently drops panics by default
+
+---
+
+## Workspace Organisation
+
+For multi-crate security projects, use a Cargo workspace. Each crate has a
+single, clear responsibility.
+
+```
+my-security-project/
+├── Cargo.toml              # Workspace manifest
+├── Cargo.lock              # Committed for workspaces with binaries
+├── crates/
+│   ├── core/               # Domain types, traits, errors (no I/O)
+│   │   ├── src/
+│   │   └── Cargo.toml
+│   ├── crypto/             # Encryption, decryption, key derivation
+│   │   ├── src/
+│   │   └── Cargo.toml
+│   ├── api/                # HTTP server (Axum), handlers, middleware
+│   │   ├── src/
+│   │   └── Cargo.toml
+│   ├── cli/                # CLI binary (clap)
+│   │   ├── src/
+│   │   └── Cargo.toml
+│   └── ffi/                # FFI bindings (PyO3 / Neon / UniFFI)
+│       ├── src/
+│       └── Cargo.toml
+└── .claude/
+    ├── CLAUDE.md
+    ├── CODING-PRINCIPLES.md
+    ├── TESTING.md
+    ├── SECURITY.md
+    └── DEVELOPMENT.md
+```
+
+**Dependency rules:**
+- `core` has no dependencies on other workspace crates
+- `crypto` depends on `core`
+- `api` and `cli` depend on `core` and `crypto`
+- `ffi` depends on `core` and `crypto`; never on `api` or `cli`
+
+---
+
+## Module Visibility
+
+Default to the most restrictive visibility. Increase only when required.
+
+| Visibility      | Use when                                     |
+| --------------- | -------------------------------------------- |
+| Private (none)  | Internal implementation details              |
+| `pub(crate)`    | Used within the crate but not public API     |
+| `pub(super)`    | Used by the parent module only               |
+| `pub`           | Stable public API, documented with `///`     |
+
+```rust
+mod internal {
+    pub(crate) fn helper() { /* ... */ }
+}
+
+pub mod api {
+    /// Public-facing function — part of the stable API.
+    pub fn process(input: &str) -> Result<Output, Error> {
+        // ...
+    }
+}
+```
+
+---
+
+## Feature Flags
+
+Use Cargo features for optional functionality. Keep the default feature set
+minimal.
+
+```toml
+# Cargo.toml
+[features]
+default = []
+tls = ["dep:rustls", "dep:tokio-rustls"]
+vault = ["dep:vaultrs"]
+metrics = ["dep:metrics", "dep:metrics-exporter-prometheus"]
+```
+
+```rust
+// Conditionally compile behind a feature flag
+#[cfg(feature = "vault")]
+pub mod vault_client {
+    // ...
+}
+```
+
+**Rules:**
+- Feature names are lowercase kebab-case
+- Never put security-critical functionality behind an optional feature
+- Document each feature in `Cargo.toml` with a comment
+
+---
+
+## Configuration
+
+Use the `config` crate or `figment` for layered configuration. Validate all
+configuration at startup — fail fast rather than failing at runtime.
+{{#if has_crypto}}
+Secrets come from HashiCorp Vault, never from the configuration file.
+{{/if}}
+
+```rust
+use config::{Config, ConfigError, Environment, File};
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+pub struct AppConfig {
+    pub server: ServerConfig,
+    pub database: DatabaseConfig,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ServerConfig {
+    pub host: String,
+    pub port: u16,
+}
+
+impl AppConfig {
+    pub fn load() -> Result<Self, ConfigError> {
+        Config::builder()
+            .add_source(File::with_name("config/default"))
+            .add_source(File::with_name("config/local").required(false))
+            .add_source(Environment::with_prefix("APP").separator("__"))
+            .build()?
+            .try_deserialize()
+    }
+}
+```
+
+---
+
+## Graceful Shutdown
+
+Handle `SIGTERM` and `SIGINT` to allow in-flight requests to complete.
+
+```rust
+use tokio::signal;
+
+pub async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install CTRL+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    tracing::info!("shutdown signal received");
+}
+
+// In main:
+axum::serve(listener, app)
+    .with_graceful_shutdown(shutdown_signal())
+    .await?;
+```
+
+---
+
+## Project Structure (Single-Crate)
+
+For simpler projects, organise by layer within a single crate.
+
+```
+src/
+├── main.rs             # Entry point — wiring only, no business logic
+├── lib.rs              # Public API re-exports
+├── config.rs           # Configuration loading and validation
+├── error.rs            # Shared error types
+├── domain/             # Domain types and traits
+│   ├── mod.rs
+│   ├── user.rs
+│   └── event.rs
+├── service/            # Business logic
+│   ├── mod.rs
+│   └── user_service.rs
+├── repository/         # Data access
+│   ├── mod.rs
+│   └── user_repository.rs
+└── api/                # HTTP layer (handlers, middleware, router)
+    ├── mod.rs
+    ├── router.rs
+    ├── handlers/
+    └── middleware/
+```
+
+---
+
+## Dependency Injection
+
+Prefer trait objects (`Arc<dyn Trait>`) for injectable dependencies in
+`AppState`. Use generics (`<S: Service>`) only when the performance overhead of
+dynamic dispatch is measured and significant.
+
+```rust
+// Preferred — simple, injectable, testable
+pub struct OrderService {
+    repo: Arc<dyn OrderRepository>,
+    notifier: Arc<dyn Notifier>,
+}
+
+// Alternative — zero-cost abstraction, but harder to mock
+pub struct OrderService<R: OrderRepository, N: Notifier> {
+    repo: R,
+    notifier: N,
+}
+```
+
+**Rule:** Default to `Arc<dyn Trait>`. Switch to generics only after profiling
+shows dynamic dispatch is a measured bottleneck.

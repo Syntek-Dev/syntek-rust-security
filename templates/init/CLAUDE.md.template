@@ -16,6 +16,22 @@ This project is configured with the **Syntek Rust Security** plugin for Claude C
 **Description**: {{description}}
 {{/if}}
 
+## Required Reading
+
+All agents must read these documents before writing or reviewing any code:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code, crypto, logging |
+| **[TESTING.md](TESTING.md)** | Testing guide — cargo test, mockall, wiremock, proptest, cargo-fuzz |
+| **[SECURITY.md](SECURITY.md)** | Memory safety, cryptographic standards, secrets management, hardening |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Development workflow, tooling, git conventions, release process |
+| **[API-DESIGN.md](API-DESIGN.md)** | Rust API design — Axum, tower middleware, error handling, rate limiting, webhooks |
+| **[ARCHITECTURE-PATTERNS.md](ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns, background tasks, configuration |
+| **[DATA-STRUCTURES.md](DATA-STRUCTURES.md)** | Rust data structures, domain modelling, newtype pattern, security types |
+| **[PERFORMANCE.md](PERFORMANCE.md)** | Benchmarking, profiling, async performance, caching, connection pooling |
+| **[ENCRYPTION-GUIDE.md](ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC lookup tokens, key rotation, migration strategy |
+
 ## Security Commands
 
 Run these commands for security analysis:

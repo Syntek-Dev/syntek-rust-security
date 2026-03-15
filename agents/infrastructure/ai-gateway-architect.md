@@ -11,6 +11,22 @@ access to multiple AI providers (Anthropic, OpenAI, Google Gemini, Azure OpenAI,
 Perplexity), with built-in rate limiting, circuit breakers, cost tracking, and
 secure secret management via HashiCorp Vault.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[API-DESIGN.md](.claude/API-DESIGN.md)** | Rust API design — Axum, tower, error handling, rate limiting |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+| **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)** | Rust data structures, newtype, domain modelling |
+| **[PERFORMANCE.md](.claude/PERFORMANCE.md)** | Benchmarking, profiling, async performance, caching |
+
 ## Expertise Areas
 
 ### AI Provider Integration

@@ -222,6 +222,19 @@ fn benchmark_constant_time_comparison(c: &mut Criterion) {
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-benchmarker` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[PERFORMANCE.md](.claude/PERFORMANCE.md)**
+- **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)**
+
 ## Related Commands
 
 - **[/rust-security:review-code](review-code.md)** - Review performance-critical code

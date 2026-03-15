@@ -1,0 +1,211 @@
+# Testing Guide — my-security-project
+
+**Purpose**: Reference document for all developers and agents writing or
+reviewing tests. Follow these conventions, patterns, and examples.
+
+---
+
+## Stack and Tooling
+
+| Tool             | Purpose                                       | How to use                          |
+| ---------------- | --------------------------------------------- | ----------------------------------- |
+| **cargo test**   | Unit and integration test runner              | `cargo test -p <crate>`             |
+| **tokio::test**  | Async Rust tests                              | `#[tokio::test]` attribute          |
+| **mockall**      | Trait-based mocking for unit tests            | `#[automock]` / `mock!` macro       |
+| **wiremock**     | HTTP mock server for outbound call testing    | `MockServer::start().await`         |
+| **proptest**     | Property-based testing (security-critical)    | `proptest!` macro                   |
+| **cargo-fuzz**   | Coverage-guided fuzzing                       | `cargo fuzz run <target>`           |
+| **assert_cmd**   | CLI integration testing                       | `Command::cargo_bin("name")`        |
+
+**Running tests:**
+
+```bash
+# Full test suite
+cargo test --workspace
+
+# Single crate
+cargo test -p my-security-project
+
+# Specific test by name pattern
+cargo test -p my-security-project test_name
+
+# With log output
+RUST_LOG=debug cargo test -- --nocapture
+
+# Doc tests
+cargo test --doc
+```
+
+---
+
+## Directory Structure
+
+```
+my-security-project/
+├── src/
+│   ├── lib.rs
+│   └── <module>.rs     # Unit tests in #[cfg(test)] at the bottom
+├── tests/
+│   └── <module>_integration.rs
+├── fuzz/
+│   └── fuzz_targets/
+│       └── <target>.rs
+└── benches/
+    └── <subject>_bench.rs
+```
+
+---
+
+## Naming Conventions
+
+- **Unit test**: `test_<behaviour>_<condition>`
+  e.g. `test_fetch_returns_none_when_path_missing`
+- **Integration test file**: `<module>_integration.rs`
+- **Test module**: `#[cfg(test)] mod tests { ... }`
+
+Avoid `test_1`, `test_thing` — always name the scenario.
+
+---
+
+## Unit Tests
+
+Test a single function in isolation. Mock all external dependencies.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mockall::predicate::*;
+
+    #[test]
+    fn test_<behaviour>_<condition>() {
+        // Arrange
+        let mut mock = MockDependency::new();
+        mock.expect_method()
+            .with(eq("expected-arg"))
+            .returning(|_| Ok("expected-result".to_string()));
+
+        // Act
+        let result = function_under_test(&mock);
+
+        // Assert
+        assert_eq!(result.unwrap(), "expected-result");
+    }
+}
+```
+
+---
+
+## Integration Tests
+
+```rust
+// tests/<module>_integration.rs
+
+#[test]
+fn test_<feature>_end_to_end() {
+    // Uses only the crate's public API
+}
+```
+
+---
+
+## HTTP Mocking with wiremock
+
+```rust
+use wiremock::{Mock, MockServer, ResponseTemplate};
+use wiremock::matchers::{method, path};
+
+#[tokio::test]
+async fn test_request_posts_to_correct_endpoint() {
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(path("/expected/path"))
+        .respond_with(ResponseTemplate::new(200))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    // Call the code under test pointing at mock_server.uri()
+
+    mock_server.verify().await;
+}
+```
+
+---
+
+## Property-Based Tests (Security-Critical)
+
+```rust
+use proptest::prelude::*;
+
+proptest! {
+    #[test]
+    fn test_parser_never_panics_on_arbitrary_input(input in ".*") {
+        // Attacker controls the input — must return Err, never panic
+        let _ = parse_untrusted_input(&input);
+    }
+
+    #[test]
+    fn test_encrypt_decrypt_roundtrip(
+        plaintext in proptest::collection::vec(any::<u8>(), 0..4096)
+    ) {
+        let key = build_test_key();
+        let ciphertext = encrypt(&key, &plaintext).expect("encryption should succeed");
+        let recovered = decrypt(&key, &ciphertext).expect("decryption should succeed");
+        prop_assert_eq!(recovered, plaintext);
+    }
+}
+```
+
+## Fuzz Targets
+
+```rust
+// fuzz/fuzz_targets/<target>.rs
+#![no_main]
+use libfuzzer_sys::fuzz_target;
+
+fuzz_target!(|data: &[u8]| {
+    // Must not panic on any input
+    let _ = parse_or_decrypt(data);
+});
+```
+
+---
+
+## FFI Boundary Tests
+
+FFI functions must not panic — panics across FFI boundaries are undefined
+behaviour.
+
+```rust
+#[test]
+fn test_ffi_export_returns_error_not_panic_on_invalid_input() {
+    // Test the FFI function with clearly invalid input
+    // Assert it returns an error, not a panic
+}
+```
+
+---
+
+## TDD Cycle
+
+1. **Red** — Write a failing test for the next behaviour.
+2. **Green** — Write the minimum code to make it pass.
+3. **Refactor** — Clean up without breaking the test.
+
+---
+
+## Rules
+
+1. Every new public Rust function has at least one unit test.
+2. Every HTTP endpoint/CLI command has integration tests (happy path, error,
+   auth failure).
+3. Tests must be deterministic — no real time, random values, or network.
+4. Tests must be independent — each sets up its own state.
+5. **Arrange-Act-Assert** structure in every test.
+6. Test behaviour, not implementation.
+7. Unit tests complete in under 10ms each.
+8. Security-critical functions use `proptest` in addition to manual cases.
+9. Test names describe the scenario, not the function name.
+10. Test code is held to the same standard as production code.

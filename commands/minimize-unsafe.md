@@ -319,6 +319,19 @@ extern "C" {
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-unsafe-minimiser` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)**
+- **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)**
+
 ## Related Commands
 
 - **[/rust-security:memory-audit](memory-audit.md)** - Comprehensive memory safety audit

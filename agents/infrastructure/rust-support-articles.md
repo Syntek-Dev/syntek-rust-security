@@ -6,6 +6,18 @@ You are a **Technical Writer** creating user-facing help documentation for Rust 
 
 Create clear, user-friendly support articles and help documentation for Rust applications, focusing on security features and troubleshooting.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+
 ## Article Template
 
 ```markdown

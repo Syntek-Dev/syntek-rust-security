@@ -25,6 +25,11 @@ creating a `.claude/` directory with the following structure:
 ├── TESTING.md                     # Testing guide and patterns
 ├── SECURITY.md                    # Security architecture and guidelines
 ├── DEVELOPMENT.md                 # Development workflow
+├── API-DESIGN.md                  # Rust API design conventions
+├── ARCHITECTURE-PATTERNS.md       # Service layer and workspace patterns
+├── DATA-STRUCTURES.md             # Data structure selection and domain modelling
+├── PERFORMANCE.md                 # Benchmarking, profiling, optimisation
+├── ENCRYPTION-GUIDE.md            # Field-level encryption, HMAC tokens, key rotation
 ├── SYNTEK-RUST-SECURITY-GUIDE.md  # Security guidelines and patterns
 ├── settings.local.json            # Local Claude Code settings
 └── plugins/
@@ -83,7 +88,65 @@ creating a `.claude/` directory with the following structure:
    - Security scanning commands
    - Git conventions and release process
 
-8. **Generate SYNTEK-RUST-SECURITY-GUIDE.md** Create security guidelines
+8a. **Generate API-DESIGN.md** Create API design guide covering:
+    - REST conventions with Axum (URL structure, HTTP methods, status codes)
+    - Request/response shapes with serde, pagination, filtering
+    - Error response format with thiserror — never leaking internals
+    - Authentication middleware (Bearer tokens, API keys)
+    - Rate limiting with tower_governor
+    - Webhook HMAC-SHA256 signing
+    - HTTP client patterns with reqwest
+    - Axum router construction and tower middleware stack
+
+8b. **Generate ARCHITECTURE-PATTERNS.md** Create architecture guide covering:
+    - Trait-based service layer pattern
+    - Repository pattern for database access
+    - AppState pattern for Axum
+    - Tower middleware pipeline (order and composition)
+    - Background tasks with tokio::spawn and spawn_blocking
+    - Cargo workspace organisation for multi-crate projects
+    - Module visibility rules
+    - Feature flags, configuration, graceful shutdown
+
+8c. **Generate DATA-STRUCTURES.md** Create data structures guide covering:
+    - Standard collections (Vec, VecDeque, HashMap, BTreeMap, HashSet)
+    - Shared ownership and interior mutability (Arc, Mutex, RwLock, DashMap)
+    - Domain modelling (structs with private fields, newtype pattern, enums)
+    - Builder pattern and type-state pattern
+    - Security-specific structures (secrecy::Secret, Zeroizing, ConstantTimeEq)
+    - Database schema considerations with sqlx
+    - Anti-patterns table
+
+8e. **Generate ENCRYPTION-GUIDE.md** Create field-level encryption guide covering:
+    - Approved algorithms (AES-256-GCM, ChaCha20-Poly1305) and banned algorithms
+    - Zero-plaintext guarantee and the encryption boundary
+    - What must and must not be encrypted
+    - Key types, separation (FEK vs HMAC key), storage, rotation, and HKDF derivation
+    - Versioned key ring and ciphertext format with key version prefix
+    - Field-level encrypt/decrypt with AAD bound to model and field name
+    - Batch operations for 3+ fields per model
+    - Deterministic HMAC-SHA256 lookup tokens — why needed, generation, normalisation
+    - Token column naming convention (`*_token`) and database lookup patterns
+    - Implementation patterns: Direct Rust, Django/PyO3, Laravel FFI, GraphQL middleware
+    - Nonce management rules (CSPRNG, no counter nonces in distributed systems)
+    - Memory safety: `Zeroize`, `ZeroizeOnDrop`, `secrecy::Secret`, `ConstantTimeEq`
+    - Migration strategy (add nullable → backfill → tighten constraints → drop old column)
+    - Required tests per encrypted field including proptest round-trip properties
+    - Encryption checklist
+
+8d. **Generate PERFORMANCE.md** Create performance guide covering:
+    - Measure-first rules (Pike Rules 1 and 2)
+    - Benchmarking with criterion.rs
+    - Profiling tools (flamegraph, cargo-instruments, perf)
+    - Avoiding unnecessary allocations (Cow, SmallVec, with_capacity)
+    - Async performance (spawn_blocking, tokio thread pool, concurrent joins)
+    - Database query optimisation (no SELECT *, connection pooling)
+    - Caching (moka, Redis) with explicit TTL rules
+    - HTTP performance (HTTP/2, compression, streaming, timeouts)
+    - Memory allocation (jemalloc/mimalloc)
+    - Metrics and monitoring checklist
+
+9. **Generate SYNTEK-RUST-SECURITY-GUIDE.md** Create security guidelines
    covering:
    - Memory safety patterns
    - Cryptographic best practices
@@ -110,7 +173,7 @@ creating a `.claude/` directory with the following structure:
 
 ### Required Documents
 
-All four required documents are generated from the plugin's templates and
+All eight required documents are generated from the plugin's templates and
 adapted for the target project's characteristics:
 
 | File | Template Source | Purpose |
@@ -119,6 +182,11 @@ adapted for the target project's characteristics:
 | `TESTING.md` | `templates/init/TESTING.md.template` | Testing guide |
 | `SECURITY.md` | `templates/init/SECURITY.md.template` | Security architecture |
 | `DEVELOPMENT.md` | `templates/init/DEVELOPMENT.md.template` | Development workflow |
+| `API-DESIGN.md` | `templates/init/API-DESIGN.md.template` | Rust API design conventions |
+| `ARCHITECTURE-PATTERNS.md` | `templates/init/ARCHITECTURE-PATTERNS.md.template` | Service layer and workspace patterns |
+| `DATA-STRUCTURES.md` | `templates/init/DATA-STRUCTURES.md.template` | Data structure selection and domain modelling |
+| `PERFORMANCE.md` | `templates/init/PERFORMANCE.md.template` | Benchmarking, profiling, optimisation |
+| `ENCRYPTION-GUIDE.md` | `templates/init/ENCRYPTION-GUIDE.md.template` | Field-level encryption, HMAC tokens, key rotation |
 
 ### CLAUDE.md Template
 
@@ -134,14 +202,19 @@ This is a Rust project configured with the Syntek Rust Security plugin.
 
 ## Required Reading
 
-All agents must read these four documents before writing or reviewing any code:
+All agents must read these documents before writing or reviewing any code:
 
 | Document | Purpose |
 | -------- | ------- |
-| **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
-| **[TESTING.md](TESTING.md)** | Testing guide, patterns, and examples |
-| **[SECURITY.md](SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
-| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Development workflow, tooling, git conventions |
+| **[CODING-PRINCIPLES.md](CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code, crypto, logging |
+| **[TESTING.md](TESTING.md)** | Testing guide — cargo test, mockall, wiremock, proptest, cargo-fuzz |
+| **[SECURITY.md](SECURITY.md)** | Memory safety, cryptographic standards, secrets management, hardening |
+| **[DEVELOPMENT.md](DEVELOPMENT.md)** | Development workflow, tooling, git conventions, release process |
+| **[API-DESIGN.md](API-DESIGN.md)** | Rust API design — Axum, tower middleware, error handling, rate limiting, webhooks |
+| **[ARCHITECTURE-PATTERNS.md](ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns, background tasks, configuration |
+| **[DATA-STRUCTURES.md](DATA-STRUCTURES.md)** | Rust data structures, domain modelling, newtype pattern, security types |
+| **[PERFORMANCE.md](PERFORMANCE.md)** | Benchmarking, profiling, async performance, caching, connection pooling |
+| **[ENCRYPTION-GUIDE.md](ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC lookup tokens, key rotation, migration strategy |
 
 ## Security Commands
 
@@ -230,6 +303,10 @@ After running `/init`:
    - Review `.claude/CODING-PRINCIPLES.md` and adapt to project conventions
    - Review `.claude/SECURITY.md` and customise for project-specific threats
    - Review `.claude/DEVELOPMENT.md` and update prerequisites as needed
+   - Review `.claude/API-DESIGN.md` and confirm conventions match your stack
+   - Review `.claude/ARCHITECTURE-PATTERNS.md` and adjust for project structure
+   - Review `.claude/DATA-STRUCTURES.md` for domain-relevant guidance
+   - Review `.claude/PERFORMANCE.md` and commit initial benchmark baselines
 
 2. **Build Plugin Tools**
 

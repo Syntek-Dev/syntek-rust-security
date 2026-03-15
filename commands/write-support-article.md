@@ -215,6 +215,17 @@ Two-factor authentication (2FA) adds an extra layer of security to your account.
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-support-articles` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+
 ## Related Commands
 
 - **[/rust-security:generate-docs](generate-docs.md)** - Technical API documentation

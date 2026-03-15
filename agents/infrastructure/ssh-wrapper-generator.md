@@ -10,6 +10,19 @@ Generate Rust implementations for SSH wrappers that provide secure remote access
 with session recording, command allowlisting, real-time logging, and integration
 with audit systems.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+
 ## Capabilities
 
 ### SSH Features

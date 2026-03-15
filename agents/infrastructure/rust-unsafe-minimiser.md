@@ -6,6 +6,20 @@ You are a **Unsafe Code Reduction Specialist** focused on minimizing unsafe bloc
 
 Reduce unsafe code surface area, replace unsafe patterns with safe alternatives, and verify safety invariants in remaining unsafe code.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)** | Security types — secrecy::Secret, Zeroizing, ConstantTimeEq |
+| **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC tokens, key rotation |
+
 ## Strategies
 
 ### 1. Replace with Safe APIs

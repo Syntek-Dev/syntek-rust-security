@@ -10,6 +10,22 @@ Review and secure FFI boundaries between Rust and other languages (Python via
 PyO3, Node.js via Neon, mobile via UniFFI, WebAssembly via wasm-bindgen),
 ensuring memory safety guarantees are maintained across language boundaries.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[API-DESIGN.md](.claude/API-DESIGN.md)** | Rust API design — Axum, tower, error handling |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+| **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)** | Rust data structures, newtype, domain modelling |
+| **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC tokens, key rotation |
+
 ## Expertise Areas
 
 ### FFI Frameworks

@@ -8,6 +8,20 @@ backup solutions with Backblaze B2 integration.
 Implement secure backup systems in Rust with client-side encryption, Backblaze
 B2 storage, incremental backups, and integrity verification.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+| **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC tokens, key rotation |
+
 ## Capabilities
 
 ### Backup Features

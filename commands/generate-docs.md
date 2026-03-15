@@ -403,6 +403,18 @@ mod internal {
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-docs` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[API-DESIGN.md](.claude/API-DESIGN.md)**
+
 ## Related Commands
 
 - **[/rust-security:version-bump](version-bump.md)** - Version management before documentation

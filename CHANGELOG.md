@@ -13,6 +13,75 @@ and this project adheres to
 
 - Placeholder for future changes
 
+## [1.0.0] - 15/03/2026
+
+### Added
+
+- First stable public release — the plugin is now live and publicly available
+- Full agent suite: 50 agents (8 Opus deep-reasoning + 14 existing Sonnet + 28
+  new agents covering encryption, FFI, server infrastructure, AI gateway, server
+  stack, and DIY security appliances)
+- Full command suite: 51 commands spanning vulnerability scanning, cryptography,
+  memory safety, infrastructure automation, AI gateway, server stack, and DIY
+  security appliance setup
+- 9 init templates in `templates/init/`: CODING-PRINCIPLES, TESTING, SECURITY,
+  DEVELOPMENT, API-DESIGN, ARCHITECTURE-PATTERNS, DATA-STRUCTURES, PERFORMANCE,
+  ENCRYPTION-GUIDE
+- 6 plugin tools (Rust binaries with shell wrappers): cargo-tool, rustc-tool,
+  vuln-db-tool, audit-tool, fuzzer-tool, compliance-tool
+- Examples library with compilable examples across security, FFI, AI gateway,
+  server infrastructure, server stack, and DIY security appliance categories
+- Required Reading pattern applied across all 50 agent files and all 51 command
+  files, directing each to the nine project documentation files in `.claude/`
+
+### Changed
+
+- Plugin stability promoted from Beta to Stable
+- API stability guaranteed from this release forward
+
+### Breaking Changes
+
+- None relative to 0.3.0. This release stabilises the existing API.
+
+## [0.3.0] - 15/03/2026
+
+### Added
+
+#### Templates
+
+- `templates/init/API-DESIGN.md.template`: Project API design standards and
+  conventions for documenting public API decisions
+- `templates/init/ARCHITECTURE-PATTERNS.md.template`: Architectural pattern
+  documentation covering project structure and design decisions
+- `templates/init/DATA-STRUCTURES.md.template`: Data structure documentation
+  covering core types, their invariants, and design rationale
+- `templates/init/PERFORMANCE.md.template`: Performance characteristics,
+  benchmarking baselines, and optimisation guidance
+- `templates/init/ENCRYPTION-GUIDE.md.template`: Encryption implementation
+  guide covering algorithms, key management, and usage patterns
+
+#### Examples
+
+- 9 new setup examples in `examples/setup/` covering all nine required
+  documentation types: API-DESIGN, ARCHITECTURE-PATTERNS, CODING-PRINCIPLES,
+  DATA-STRUCTURES, DEVELOPMENT, ENCRYPTION-GUIDE, PERFORMANCE, SECURITY,
+  TESTING
+
+### Changed
+
+- `templates/init/CLAUDE.md.template`: Required Reading table expanded from
+  4 rows to 9 rows, incorporating API-DESIGN, ARCHITECTURE-PATTERNS,
+  DATA-STRUCTURES, PERFORMANCE, and ENCRYPTION-GUIDE alongside the original
+  four documents
+- `commands/init.md`: Updated to generate all nine required documentation files
+  in `.claude/` of the target project
+- `agents/setup/project-initializer.md`: Updated to reference all nine
+  documentation templates and the expanded Required Reading table
+- All 50 agent files: Added `## Required Reading` sections pointing to the nine
+  documentation files in `.claude/`
+- All 51 command files: Added `## Reference Documents` sections listing the
+  nine documentation files in `.claude/`
+
 ## [0.2.1] - 24/02/2026
 
 ### Added
@@ -165,7 +234,11 @@ and this project adheres to
   - Syntek Dev Suite integration guide
 
 [Unreleased]:
-  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.1...HEAD
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.0.0...HEAD
+[1.0.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.3.0...v1.0.0
+[0.3.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.1...v0.3.0
 [0.2.1]:
   https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.2.0...v0.2.1
 [0.2.0]:

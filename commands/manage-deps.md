@@ -222,6 +222,17 @@ time = { version = "0.3", features = ["macros"] }  # 150KB
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-dependency-manager` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+
 ## Related Commands
 
 - **[/rust-security:vuln-scan](vuln-scan.md)** - Scan for vulnerable dependencies

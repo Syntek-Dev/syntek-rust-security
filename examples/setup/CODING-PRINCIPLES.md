@@ -1,0 +1,181 @@
+# Coding Principles
+
+These principles apply to **all code** in this project. Read and apply them
+before writing or reviewing any code.
+
+---
+
+## Length of Coding Files
+
+Each coding file should be a maximum of 750 lines with a grace of 50 lines,
+this includes comments. If a file gets above 750 lines (or the grace lines),
+make the code file into modules and import them into a central file.
+
+## Rob Pike's 5 Rules of Programming
+
+**Rule 1 — Don't guess where the bottleneck is**
+Bottlenecks occur in surprising places. Don't put in a speed hack until you
+know that is where the bottleneck is.
+
+**Rule 2 — Measure before you tune**
+Don't tune for speed until you've measured, and even then don't unless one part
+of the code overwhelms the rest.
+
+**Rule 3 — Fancy algorithms are slow when N is small**
+N is usually small. Until you know that N is frequently going to be large,
+don't get fancy. Even if N does get large, use Rule 2 first.
+
+**Rule 4 — Fancy algorithms are buggier**
+Use simple, reusable, easy-to-maintain algorithms and simple data structures.
+
+**Rule 5 — Data dominates**
+Choose the right data structures and the algorithms will almost always be
+self-evident.
+
+---
+
+## Linus Torvalds' Coding Principles
+
+**Rule 1 — Data structures over algorithms**
+Focus on how data is organised — the logic will naturally follow.
+
+**Rule 2 — "Good taste" in coding**
+Remove special cases. Simplify logic. Reduce branches.
+
+**Rule 3 — Readability and maintainability**
+Short functions. Descriptive names. Avoid excessive indentation.
+
+**Rule 4 — Code structure and style**
+One operation per line. Avoid multiple assignments on a single line.
+
+**Rule 5 — Favour stability over complexity**
+Stability and predictability matter more than doing something clever.
+
+**Rule 6 — Make it work, then make it better**
+Don't over-optimise. Write for the next maintainer.
+
+---
+
+## Error Handling
+
+- Use custom error types over generic ones.
+- Every error answers: what went wrong, why, and what to do about it.
+- Propagate with `?` and attach context at the caller boundary with `anyhow`
+  or `thiserror`. Never lose the original error.
+- Do not return `Option` where `Result` is the more honest type.
+- Avoid `unwrap()` and `expect()` in production code. Always annotate with a
+  comment explaining why the invariant holds.
+- Security errors must not leak sensitive context in their message.
+
+---
+
+## Naming Conventions
+
+- **Booleans** read as questions: `is_active`, `has_permission`, `can_retry`.
+- **Functions** are verbs: `fetch_secret`, `validate_token`, `rotate_cert`.
+- **Rust**: `snake_case` for variables/functions/modules; `PascalCase` for
+  types/traits/enums; `SCREAMING_SNAKE_CASE` for constants.
+- **No abbreviations** unless universally understood (`url`, `id`, `cfg`).
+- **No single-letter variables** except in tight loops (`i`, `j`).
+- **Security-sensitive types** use newtypes: `struct ApiKey(String)`.
+
+---
+
+## Unsafe Code
+
+- Every `unsafe` block must have a `// SAFETY:` comment immediately above it
+  explaining why the required invariants are upheld.
+- Minimise the scope of `unsafe` blocks — wrap only the specific lines that
+  require it.
+- Run `cargo geiger` to track the unsafe surface area.
+
+---
+
+## Memory Safety and Zeroisation
+
+- Wrap sensitive values in `secrecy::Secret<T>`.
+- Use `zeroize::ZeroizeOnDrop` on all types holding keys, passwords, or tokens.
+- Never store sensitive data in `String` or `Vec<u8>` without a zeroising
+  wrapper.
+- Avoid cloning sensitive types. If you must clone, ensure the clone is also
+  zeroised.
+
+---
+
+## Testing
+
+Every public function, module, and tool requires tests. See
+**[TESTING.md](TESTING.md)** for the full testing guide.
+
+- Every public Rust function has at least one unit test.
+- Every HTTP endpoint and CLI command has integration tests.
+- Security-critical functions have property-based tests with `proptest`.
+- Test names describe the scenario: `test_vault_fetch_returns_none_on_missing_path`.
+
+---
+
+## Comments and Documentation
+
+- `///` doc comments are mandatory on all public APIs.
+- Comments explain **why**, not **what**.
+- `// SAFETY:` comments are mandatory above every `unsafe` block.
+- `// TODO(name): ...` — always include a name or ticket reference.
+- Avoid commented-out code in committed files.
+
+---
+
+## Security
+
+- **Never hardcode** secrets, API keys, or credentials in committed files.
+- **Validate and sanitise** all external input at system boundaries.
+- **Pin all dependencies** explicitly. Commit `Cargo.lock` for binaries.
+- See **[SECURITY.md](SECURITY.md)** for detailed security patterns.
+
+---
+
+## Dependencies
+
+Before adding any dependency, verify:
+1. Can this be implemented simply without it?
+2. Is it actively maintained?
+3. Does it have a clean security track record? (Check RustSec)
+4. Is the licence compatible? (MIT, Apache 2.0, MPL 2.0)
+5. Is the version pinned explicitly?
+
+---
+
+## Git and Version Control
+
+- **Atomic commits**: each commit does exactly one thing.
+- **Conventional Commits**: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`.
+- Subject line under 72 characters.
+- **Never commit** secrets, `.env` files, or `target/` artefacts.
+
+---
+
+## Code Review Checklist
+
+- [ ] Errors handled explicitly — no silent failures or unchecked `unwrap()`
+- [ ] All public functions have tests
+- [ ] Test names describe the scenario
+- [ ] No secrets or credentials in the diff
+- [ ] No new dependency added without evaluation
+- [ ] Every `unsafe` block has a `// SAFETY:` comment
+- [ ] Every modified file stays within the 750-line limit
+- [ ] Relevant documentation updated
+
+---
+
+## Logging
+
+| Level   | Use for                                                       |
+| ------- | ------------------------------------------------------------- |
+| `TRACE` | Extremely detailed internals — crypto operations, byte counts |
+| `DEBUG` | Development detail — request payloads, query parameters       |
+| `INFO`  | Significant state changes — service started, rotation done    |
+| `WARN`  | Recoverable issues — retry attempted, fallback used           |
+| `ERROR` | Failures requiring attention — request failed, write error    |
+
+- **Never log sensitive data**: passwords, tokens, private keys.
+- Use the `tracing` crate with structured fields in production services.
+- Security events must always be logged at `WARN` or above.

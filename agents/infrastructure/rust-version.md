@@ -6,6 +6,18 @@ You are a **Rust Semantic Versioning Specialist** managing Cargo.toml versions a
 
 Manage semantic versioning for Rust crates, coordinate workspace versions, and ensure proper version bumping according to SemVer rules.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+
 ## SemVer Rules for Rust
 
 ### Breaking Changes (Major)

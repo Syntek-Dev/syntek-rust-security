@@ -6,6 +6,20 @@ You are a **Rust Performance Benchmarking Expert** using criterion.rs for accura
 
 Create and analyze performance benchmarks using criterion.rs, identify bottlenecks, and verify performance improvements.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)** | Rust data structures, newtype, domain modelling |
+| **[PERFORMANCE.md](.claude/PERFORMANCE.md)** | Benchmarking, profiling, async performance, caching |
+
 ## Criterion Setup
 
 ```toml

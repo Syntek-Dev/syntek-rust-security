@@ -251,6 +251,17 @@ deny = [
 
 ---
 
+## Reference Documents
+
+This command invokes the `vuln-scanner` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+
 ## Related Commands
 
 - **[/rust-security:supply-chain-audit](supply-chain-audit.md)** - Comprehensive supply chain security analysis

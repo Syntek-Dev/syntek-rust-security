@@ -4,6 +4,171 @@ Official release information for syntek-rust-security plugin.
 
 ---
 
+## v1.0.0 - First Stable Public Release (15/03/2026)
+
+**Release Type**: Major
+**Stability**: Stable
+**Download**: [GitHub Releases](https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v1.0.0)
+
+### Highlights
+
+This is the first stable public release of the Syntek Rust Security Plugin. The
+plugin is now live and publicly available. The API is stable and guaranteed
+forward-compatible within the 1.x series.
+
+All features developed across the 0.x series are included and fully supported:
+the complete agent suite, command suite, init template system, plugin tools,
+and examples library.
+
+#### Full Agent Suite (50 Agents)
+
+- **8 Opus agents** for deep-reasoning tasks: threat-modeller, crypto-reviewer,
+  pentester, rust-gdpr, rust-refactor, rust-review, rust-unsafe-minimiser,
+  rust-api-designer
+- **14 existing Sonnet agents** for standard analysis across vulnerability
+  scanning, memory safety, fuzzing, secrets, supply chain, binary analysis,
+  compliance, version management, documentation, testing, benchmarking, and
+  dependency management
+- **28 new agents** covering encryption architecture, FFI security review,
+  server hardening, memory zeroisation, AI gateway design, threat detection,
+  network security, SSH wrappers, certificate management, Vault integration,
+  Cloudflare management, Docker security, backup management, token rotation,
+  firewall integration, AI gateway building, Nginx/Gunicorn/Redis configuration,
+  and DIY security appliance construction
+
+#### Full Command Suite (51 Commands)
+
+All 51 user-invocable commands are available, spanning:
+
+- Vulnerability scanning, cryptographic review, memory audit, threat modelling
+- Encryption and decryption setup, memory zeroisation audit
+- Vault and secret management, token rotation
+- SSH wrappers, certificate rotation, Cloudflare integration, Docker hardening,
+  Backblaze B2 backup, firewall setup, server hardening, FFI audit
+- AI gateway setup and provider management
+- Nginx, Gunicorn, Redis, and systemd configuration
+- DIY security appliance initialisation (router, NAS, homeserver, gateway)
+- Malware scanner, IDS/IPS, DNS proxy, threat feeds, DPI, and quarantine setup
+
+#### 9-Document Init Template System
+
+Projects initialised with `/init` receive the full nine-document suite in
+`.claude/`:
+
+1. CODING-PRINCIPLES — coding standards, error handling, naming
+2. TESTING — testing guide with cargo test, proptest, cargo-fuzz
+3. SECURITY — memory safety, crypto standards, vault integration, hardening
+4. DEVELOPMENT — dev workflow, prerequisites, git conventions
+5. API-DESIGN — public API decisions, naming rationale, versioning strategy
+6. ARCHITECTURE-PATTERNS — project structure, module organisation, design
+   decisions
+7. DATA-STRUCTURES — core types, invariants, ownership model
+8. PERFORMANCE — timing targets, profiling notes, optimisation guidance
+9. ENCRYPTION-GUIDE — algorithm selection, key management, usage patterns
+
+All 50 agents and all 51 commands reference all nine documents via standardised
+`## Required Reading` and `## Reference Documents` sections.
+
+#### 6 Plugin Tools (Rust Binaries)
+
+- **cargo-tool**: Project metadata extraction from Cargo.toml
+- **rustc-tool**: Toolchain version detection and configuration
+- **vuln-db-tool**: RustSec database management and CVE lookups
+- **audit-tool**: Security audit orchestration (cargo-audit, cargo-deny,
+  cargo-geiger)
+- **fuzzer-tool**: Fuzzing infrastructure management (libfuzzer, AFL++,
+  honggfuzz)
+- **compliance-tool**: Compliance report generation (OWASP, CWE, CVSS)
+
+All tools include shell wrapper scripts in `plugins/bin/` with auto-build
+support and a `docs` subcommand for required documentation discovery.
+
+### What's Changed Since 0.3.0
+
+- Plugin stability promoted from Beta to Stable
+- API stability guaranteed within the 1.x series
+- No breaking changes relative to 0.3.0
+
+### Breaking Changes
+
+None. Existing projects and workflows continue to work without modification.
+
+### System Requirements
+
+- Claude Code >= 1.0.0
+- syntek-dev-suite >= 1.0.0
+- Rust >= 1.92.0
+
+### Documentation
+
+- [README.md](README.md) - Plugin overview
+- [CHANGELOG.md](CHANGELOG.md) - Full change history
+- [CLAUDE.md](CLAUDE.md) - Plugin configuration and agent reference
+- [templates/init/](templates/init/) - All nine initialisation templates
+- [examples/](examples/) - Compilable examples library
+
+---
+
+## v0.3.0 - Documentation Expansion (2026-03-15)
+
+**Release Type**: Minor
+**Stability**: Beta
+**Download**: [GitHub Releases](https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v0.3.0)
+
+### Highlights
+
+This release expands the project initialisation system from four core documents
+to nine, giving every initialised project a comprehensive documentation suite.
+All 50 agents and 51 commands have been updated to reference the full document
+set, and nine new setup examples provide ready-to-use documentation starters.
+
+#### Expanded Required Reading System
+
+- **9-Document Suite**: Projects now initialise with API-DESIGN,
+  ARCHITECTURE-PATTERNS, DATA-STRUCTURES, PERFORMANCE, and ENCRYPTION-GUIDE
+  alongside the original CODING-PRINCIPLES, TESTING, SECURITY, and DEVELOPMENT
+- **5 New Init Templates**: All five new documentation types have corresponding
+  `.template` files in `templates/init/`
+- **9 New Setup Examples**: `examples/setup/` now contains a reference example
+  for each of the nine documentation types
+
+#### Comprehensive Agent and Command Updates
+
+- **50 Agent Files**: Every agent now includes a `## Required Reading` section
+  directing it to the nine documentation files in `.claude/`
+- **51 Command Files**: Every command now includes a `## Reference Documents`
+  section listing all nine documentation files
+
+### What's Changed
+
+- `templates/init/` — 5 new template files
+- `examples/setup/` — 9 new example files
+- `templates/init/CLAUDE.md.template` — Required Reading table expanded to 9
+  rows
+- `commands/init.md` — generates all 9 docs on initialisation
+- `agents/setup/project-initializer.md` — references all 9 templates
+- All 50 agent files — `## Required Reading` sections added
+- All 51 command files — `## Reference Documents` sections added
+
+### Breaking Changes
+
+None. Existing projects continue to work without modification. Re-running
+`/init` will add the five new documentation files to `.claude/`.
+
+### System Requirements
+
+- Claude Code >= 1.0.0
+- syntek-dev-suite >= 1.0.0
+- Rust >= 1.92.0
+
+### Documentation
+
+- [README.md](README.md) - Plugin overview
+- [CHANGELOG.md](CHANGELOG.md) - Full change history
+- [templates/init/](templates/init/) - All nine initialisation templates
+
+---
+
 ## v0.1.0 - Initial Release (2026-01-10)
 
 **Release Type**: Beta
@@ -148,7 +313,7 @@ SHA256 (syntek-rust-security-0.1.0.tar.gz):
 
 ## Upcoming Releases
 
-### v0.2.0 (Planned)
+### v1.1.0 (Planned)
 
 **Focus**: Enhanced fuzzing and additional Rust frameworks
 
@@ -158,11 +323,10 @@ SHA256 (syntek-rust-security-0.1.0.tar.gz):
 - WebAssembly security analysis
 - SARIF output format support
 
-### v1.0.0 (Planned)
+### v1.2.0 (Planned)
 
-**Focus**: Production stability and enterprise features
+**Focus**: Enterprise features and integrations
 
-- Guaranteed API stability
 - Enterprise compliance features
 - CI/CD integration examples
 - GitHub Security Advisories API integration
@@ -171,4 +335,5 @@ SHA256 (syntek-rust-security-0.1.0.tar.gz):
 
 ---
 
-**Note**: This is a beta release. While production-ready for testing, APIs may change before v1.0.0. Please report issues on GitHub.
+**Note**: v1.0.0 is a stable release. The API is guaranteed stable within the
+1.x series. Please report issues on GitHub.

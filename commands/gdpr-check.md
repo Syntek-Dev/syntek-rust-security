@@ -379,6 +379,19 @@ pub fn pseudonymize_user_id(user_id: Uuid, pepper: &[u8]) -> String {
 
 ---
 
+## Reference Documents
+
+This command invokes the `rust-gdpr` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)**
+- **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)**
+
 ## Related Commands
 
 - **[/rust-security:compliance-report](compliance-report.md)** - Generate compliance reports

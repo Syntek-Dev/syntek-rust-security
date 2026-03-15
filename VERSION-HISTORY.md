@@ -5,6 +5,196 @@
 
 ---
 
+## Version 1.0.0 (2026-03-15)
+
+**Type**: Major Release **Stability**: Stable **Breaking Changes**: None
+
+### Summary
+
+First stable public release. The plugin is now live and publicly available. API
+stability is guaranteed within the 1.x series. All features developed across the
+0.x series are included: full agent suite (50 agents), full command suite (51
+commands), nine-document init template system, six Rust plugin tools with shell
+wrappers, and a comprehensive examples library. The Required Reading pattern is
+applied consistently across all agent and command files.
+
+### Technical Details
+
+#### Architecture
+
+- **Total Agents**: 50 (8 Opus + 42 Sonnet, across security, infrastructure,
+  FFI, AI gateway, server stack, and DIY security appliance domains)
+- **Total Commands**: 51 user-invocable commands
+- **Init Templates**: 9 documentation templates in `templates/init/`
+- **Plugin Tools**: 6 Rust binaries with shell wrappers in `plugins/bin/`
+- **Skills**: 22 domain knowledge modules
+- **Templates**: 36 project scaffold templates
+- **Examples**: 159+ compilable Rust examples
+
+#### Stability Promotion
+
+- Plugin stability promoted from Beta to Stable
+- API interfaces for agents, commands, and plugin tools are now stable
+- No breaking changes from 0.3.0; existing workflows continue unmodified
+
+#### Complete Feature Set
+
+**Agent Suite (50 agents)**
+
+All agents from 0.x are included and stable:
+
+- Security Opus agents (8): threat-modeller, crypto-reviewer, pentester,
+  rust-gdpr, rust-refactor, rust-review, rust-unsafe-minimiser, rust-api-designer
+- Infrastructure Sonnet agents (14): vuln-scanner, memory-safety, fuzzer,
+  secrets-auditor, supply-chain, binary-analyser, compliance-auditor,
+  rust-version, rust-docs, rust-support-articles, rust-git, rust-test-writer,
+  rust-benchmarker, rust-dependency-manager
+- New agents (28): encryption-architect, ffi-security-reviewer, server-hardener,
+  zeroize-auditor, ai-gateway-architect, threat-detection-architect,
+  network-security-architect, ai-gateway-builder, ssh-wrapper-generator,
+  cert-manager, vault-integrator, cloudflare-manager, docker-security,
+  backup-manager, token-rotator, firewall-integrator, nginx-configurator,
+  gunicorn-configurator, redis-configurator, systemd-hardener,
+  router-security-builder, nas-security-builder, homeserver-security-builder,
+  gateway-security-builder, malware-scanner-builder, dns-security-builder,
+  intrusion-detector-builder, threat-intel-integrator
+
+**Command Suite (51 commands)**
+
+All commands include `## Reference Documents` sections pointing to the nine
+init documentation files.
+
+**Init Template System (9 templates)**
+
+CODING-PRINCIPLES, TESTING, SECURITY, DEVELOPMENT, API-DESIGN,
+ARCHITECTURE-PATTERNS, DATA-STRUCTURES, PERFORMANCE, ENCRYPTION-GUIDE
+
+**Plugin Tools (6 Rust binaries)**
+
+cargo-tool, rustc-tool, vuln-db-tool, audit-tool, fuzzer-tool,
+compliance-tool — each with a shell wrapper in `plugins/bin/` and a `docs`
+subcommand for documentation discovery
+
+**Required Reading Pattern**
+
+All 50 agent files include `## Required Reading` sections. All 51 command files
+include `## Reference Documents` sections. Both direct to the nine
+documentation files in `.claude/`.
+
+### Known Issues
+
+- None
+
+### Migration Guide
+
+No breaking changes. Existing projects continue to work without modification.
+
+### Performance Characteristics
+
+- **Security Scan Time**: < 5 minutes for typical projects
+- **False Positive Rate**: < 10% target
+- **Agent Response Time**: 2-30 seconds depending on model
+
+### Contributors
+
+- Syntek Studio Development Team
+
+---
+
+## Version 0.3.0 (2026-03-15)
+
+**Type**: Minor Release **Stability**: Beta **Breaking Changes**: None
+
+### Summary
+
+Expands the project initialisation system from four core documentation files to
+nine. All agent and command files have been updated to reference the full
+documentation suite, ensuring consistent access to project standards across
+every interaction. Nine new setup examples provide ready-to-use documentation
+starters for initialised projects.
+
+### Technical Details
+
+#### Architecture Changes
+
+- **Init Templates**: 12 total (expanded from 7, adding 5 new templates)
+- **Setup Examples**: 9 new examples covering all nine documentation types
+- **Agent Files**: All 50 updated with `## Required Reading` sections
+- **Command Files**: All 51 updated with `## Reference Documents` sections
+- **Required Reading Table**: Expanded from 4 rows to 9 rows in CLAUDE.md
+  template
+
+#### New Init Templates (5)
+
+1. **API-DESIGN.md.template**: API design standards and conventions — documents
+   public API decisions, naming rationale, and versioning strategy for the
+   project.
+
+2. **ARCHITECTURE-PATTERNS.md.template**: Architectural pattern documentation —
+   covers project structure, module organisation, and design decisions with
+   rationale.
+
+3. **DATA-STRUCTURES.md.template**: Core data structure documentation — defines
+   key types, their invariants, ownership model, and the reasoning behind
+   structural choices.
+
+4. **PERFORMANCE.md.template**: Performance characteristics and benchmarking
+   baselines — captures timing targets, profiling notes, and known
+   optimisation considerations.
+
+5. **ENCRYPTION-GUIDE.md.template**: Encryption implementation guide — covers
+   algorithm selection, key management lifecycle, and usage patterns for the
+   project's cryptographic operations.
+
+#### New Setup Examples (9)
+
+`examples/setup/` now contains one reference example per documentation type:
+
+- `API-DESIGN.md` — example API design document
+- `ARCHITECTURE-PATTERNS.md` — example architecture document
+- `CODING-PRINCIPLES.md` — example coding principles document
+- `DATA-STRUCTURES.md` — example data structures document
+- `DEVELOPMENT.md` — example development workflow document
+- `ENCRYPTION-GUIDE.md` — example encryption guide
+- `PERFORMANCE.md` — example performance document
+- `SECURITY.md` — example security document
+- `TESTING.md` — example testing guide
+
+#### Agent and Command Updates
+
+- All 50 agent files: `## Required Reading` section added, listing all nine
+  documentation files under `.claude/` with a note that agents must read them
+  before writing or reviewing code.
+- All 51 command files: `## Reference Documents` section added, listing all
+  nine documentation files under `.claude/`.
+- `agents/setup/project-initializer.md`: Updated to generate all nine files
+  from the expanded template set.
+- `commands/init.md`: Updated to document the generation of all nine files.
+- `templates/init/CLAUDE.md.template`: Required Reading table expanded from
+  4 rows to 9 rows.
+
+### Known Issues
+
+- None
+
+### Migration Guide
+
+No breaking changes. Existing projects continue to work. To add the five new
+documentation files to an existing initialised project, re-run `/init` and
+confirm overwrite, or manually copy the new templates from `templates/init/`.
+
+### Performance Characteristics
+
+- **Security Scan Time**: < 5 minutes for typical projects
+- **False Positive Rate**: < 10% target
+- **Agent Response Time**: 2-30 seconds depending on model
+
+### Contributors
+
+- Syntek Studio Development Team
+
+---
+
 ## Version 0.2.0 (2026-01-24)
 
 **Type**: Minor Release **Stability**: Beta **Breaking Changes**: None
@@ -360,9 +550,9 @@ This plugin follows [Semantic Versioning 2.0.0](https://semver.org/):
 ### Version Metadata
 
 ```
-VERSION: 0.1.0
-RELEASE_DATE: 2026-01-10
-STABILITY: beta
-RUST_MSRV: 1.70.0
+VERSION: 1.0.0
+RELEASE_DATE: 2026-03-15
+STABILITY: stable
+RUST_MSRV: 1.92.0
 CLAUDE_CODE_VERSION: >=1.0.0
 ```

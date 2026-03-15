@@ -112,6 +112,19 @@ deployment support, audit logging, and rollback capabilities.
 
 ---
 
+## Reference Documents
+
+This command invokes the `token-rotator` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)**
+- **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)**
+
 ## Related Commands
 
 - **[/rust-security:vault-setup](vault-setup.md)** - HashiCorp Vault integration

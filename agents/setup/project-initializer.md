@@ -81,7 +81,9 @@ Substitutions:
 - `{{has_network}}` - Boolean for conditional sections
 
 The generated CLAUDE.md must include a Required Reading table linking to all
-four documents: CODING-PRINCIPLES.md, TESTING.md, SECURITY.md, DEVELOPMENT.md.
+nine documents: CODING-PRINCIPLES.md, TESTING.md, SECURITY.md, DEVELOPMENT.md,
+API-DESIGN.md, ARCHITECTURE-PATTERNS.md, DATA-STRUCTURES.md, PERFORMANCE.md,
+ENCRYPTION-GUIDE.md.
 
 #### CODING-PRINCIPLES.md
 
@@ -120,6 +122,67 @@ Substitutions:
 - `{{rust_version}}` - MSRV or "1.92.0"
 
 No feature-flag conditionals — DEVELOPMENT.md is always the full document.
+
+#### API-DESIGN.md
+
+Use template: `templates/init/API-DESIGN.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_web}}` - Include REST conventions, Axum router, tower middleware sections if true
+- `{{has_network}}` - Include gRPC section and HTTP client patterns if true
+
+Substitutions:
+- `{{project_name}}` - Package name
+- `{{current_date}}` - Current date
+
+#### ARCHITECTURE-PATTERNS.md
+
+Use template: `templates/init/ARCHITECTURE-PATTERNS.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_web}}` - Include service layer, repository, AppState, middleware pipeline sections if true
+- `{{has_network}}` - Influences background task examples
+- `{{has_crypto}}` - Include Vault reference in configuration section if true
+
+Substitutions:
+- `{{project_name}}` - Package name
+- `{{current_date}}` - Current date
+
+#### DATA-STRUCTURES.md
+
+Use template: `templates/init/DATA-STRUCTURES.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_crypto}}` - Include security-specific structures section (secrecy::Secret, Zeroizing, ConstantTimeEq) if true
+
+Substitutions:
+- `{{project_name}}` - Package name
+- `{{current_date}}` - Current date
+
+#### PERFORMANCE.md
+
+Use template: `templates/init/PERFORMANCE.md.template`
+
+Adapt for the target project's detected characteristics:
+- `{{has_crypto}}` - Include encryption benchmark example if true
+- `{{has_web}}` - Include HTTP performance section and request routing benchmark if true
+- `{{has_network}}` - Include async performance section (spawn_blocking, thread pool) if true
+
+Substitutions:
+- `{{project_name}}` - Package name
+- `{{current_date}}` - Current date
+
+#### ENCRYPTION-GUIDE.md
+
+Use template: `templates/init/ENCRYPTION-GUIDE.md.template`
+
+This document is always generated — it applies to any project that may handle
+sensitive data, not only those with detected cryptographic crates.
+
+Substitutions:
+- `{{current_date}}` - Current date in DD/MM/YYYY format
+
+No feature-flag conditionals — ENCRYPTION-GUIDE.md is always the full document.
 
 #### SYNTEK-RUST-SECURITY-GUIDE.md
 
@@ -181,6 +244,11 @@ Created files:
   .claude/TESTING.md
   .claude/SECURITY.md
   .claude/DEVELOPMENT.md
+  .claude/API-DESIGN.md
+  .claude/ARCHITECTURE-PATTERNS.md
+  .claude/DATA-STRUCTURES.md
+  .claude/PERFORMANCE.md
+  .claude/ENCRYPTION-GUIDE.md
   .claude/SYNTEK-RUST-SECURITY-GUIDE.md
   .claude/settings.local.json
   .claude/plugins/Cargo.toml
@@ -203,9 +271,11 @@ Next steps:
   1. Review .claude/CLAUDE.md and customize as needed
   2. Review .claude/CODING-PRINCIPLES.md and adapt to project conventions
   3. Review .claude/SECURITY.md and customise for project-specific threats
-  4. Run /vuln-scan to check for vulnerabilities
-  5. Run /memory-audit to analyze unsafe code
-  6. Commit .claude/ to version control
+  4. Review .claude/API-DESIGN.md and confirm conventions match your stack
+  5. Review .claude/ARCHITECTURE-PATTERNS.md and adjust for project structure
+  6. Run /vuln-scan to check for vulnerabilities
+  7. Run /memory-audit to analyze unsafe code
+  8. Commit .claude/ to version control
 ```
 
 ## Error Handling
@@ -277,6 +347,11 @@ Error details:
 | `templates/init/TESTING.md.template`                    | `.claude/TESTING.md`                    |
 | `templates/init/SECURITY.md.template`                   | `.claude/SECURITY.md`                   |
 | `templates/init/DEVELOPMENT.md.template`                | `.claude/DEVELOPMENT.md`                |
+| `templates/init/API-DESIGN.md.template`                 | `.claude/API-DESIGN.md`                 |
+| `templates/init/ARCHITECTURE-PATTERNS.md.template`      | `.claude/ARCHITECTURE-PATTERNS.md`      |
+| `templates/init/DATA-STRUCTURES.md.template`            | `.claude/DATA-STRUCTURES.md`            |
+| `templates/init/PERFORMANCE.md.template`                | `.claude/PERFORMANCE.md`                |
+| `templates/init/ENCRYPTION-GUIDE.md.template`           | `.claude/ENCRYPTION-GUIDE.md`           |
 | `templates/init/SYNTEK-RUST-SECURITY-GUIDE.md.template` | `.claude/SYNTEK-RUST-SECURITY-GUIDE.md` |
 | `templates/init/settings.local.json.template`           | `.claude/settings.local.json`           |
 | `plugins/Cargo.toml`                                    | `.claude/plugins/Cargo.toml`            |

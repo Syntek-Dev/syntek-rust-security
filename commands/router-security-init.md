@@ -93,6 +93,20 @@ router-security/
 
 ---
 
+## Reference Documents
+
+This command invokes the `router-security-builder` agent. The agent reads these documents
+from the target project's `.claude/` directory before starting work. Ensure the
+project has been initialised with `/init`:
+
+- **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)**
+- **[SECURITY.md](.claude/SECURITY.md)**
+- **[TESTING.md](.claude/TESTING.md)**
+- **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)**
+- **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)**
+- **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)**
+- **[PERFORMANCE.md](.claude/PERFORMANCE.md)**
+
 ## Related Commands
 
 - **[/rust-security:ids-setup](ids-setup.md)** - IDS rule configuration

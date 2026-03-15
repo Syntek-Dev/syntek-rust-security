@@ -6,6 +6,20 @@ Sonnet-based agent for building Rust DNS security proxies with DNS-over-HTTPS
 (DoH) and DNS-over-TLS (DoT) support, DNS sinkholing for malicious domains,
 query logging and analysis, and ad/tracker blocking at the network level.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+| **[PERFORMANCE.md](.claude/PERFORMANCE.md)** | Benchmarking, profiling, async performance, caching |
+
 ## Capabilities
 
 - DNS-over-HTTPS (DoH) proxy implementation

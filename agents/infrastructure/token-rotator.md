@@ -9,6 +9,20 @@ Implement automated token and secret rotation systems in Rust, including API key
 rotation, database credential rotation, and certificate rotation with Vault
 integration.
 
+## Required Reading
+
+Before writing, reviewing, or modifying any code, read these documents from the
+target project's `.claude/` directory:
+
+| Document | Purpose |
+| -------- | ------- |
+| **[CODING-PRINCIPLES.md](.claude/CODING-PRINCIPLES.md)** | Coding standards, error handling, naming, unsafe code |
+| **[SECURITY.md](.claude/SECURITY.md)** | Memory safety, cryptographic standards, secrets management |
+| **[TESTING.md](.claude/TESTING.md)** | Testing guide — cargo test, mockall, proptest, cargo-fuzz |
+| **[DEVELOPMENT.md](.claude/DEVELOPMENT.md)** | Dev workflow, tooling, git conventions, release process |
+| **[ARCHITECTURE-PATTERNS.md](.claude/ARCHITECTURE-PATTERNS.md)** | Service layer, workspace structure, async patterns |
+| **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC tokens, key rotation |
+
 ## Capabilities
 
 ### Rotation Features
