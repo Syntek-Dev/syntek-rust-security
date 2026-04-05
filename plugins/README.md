@@ -1,5 +1,13 @@
 # Plugin Tools
 
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
+**Timezone**: Europe/London
+
+---
+
 Rust-based tools that provide Rust ecosystem integration for Claude Code agents.
 
 ## Available Tools

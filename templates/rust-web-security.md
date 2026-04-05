@@ -184,6 +184,43 @@ overflow-checks = true
 - Implement role-based access control (RBAC)
 - Validate permissions on every request
 - Use secure session management
+- **Enable PostgreSQL Row Level Security (RLS) on all tables containing user or tenant data** — this enforces data isolation at the database layer, independent of the application stack
+
+```sql
+-- migrations/001_initial.sql
+-- Enable RLS on every table with user-scoped data
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users FORCE ROW LEVEL SECURITY;
+
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents FORCE ROW LEVEL SECURITY;
+
+-- Policy: each user sees only their own rows
+CREATE POLICY user_isolation ON documents
+    FOR ALL
+    TO app_user
+    USING (owner_id = current_setting('app.current_user_id')::uuid);
+
+-- For multi-tenant data, scope by tenant as well
+CREATE POLICY tenant_isolation ON documents
+    FOR ALL
+    TO app_user
+    USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
+```
+
+```rust
+// src/db/rls.rs — set session variables before every query
+pub async fn set_rls_context(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    user_id: uuid::Uuid,
+) -> Result<(), sqlx::Error> {
+    sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+        .bind(user_id.to_string())
+        .execute(tx.as_mut())
+        .await?;
+    Ok(())
+}
+```
 
 #### A02: Cryptographic Failures
 - Use Argon2 for password hashing
@@ -720,7 +757,62 @@ where
 }
 ```
 
-### Example 6: SQL Injection Prevention with SQLx
+### Example 6: Row Level Security with SQLx
+
+```rust
+// src/db/rls.rs
+use sqlx::{PgPool, Postgres, Transaction};
+use uuid::Uuid;
+use anyhow::Result;
+
+/// Every DB transaction that touches user-scoped data MUST call this first.
+/// RLS policies on the DB enforce isolation regardless of application logic,
+/// but the session variable must be set so policies can evaluate correctly.
+pub async fn set_rls_context(tx: &mut Transaction<'_, Postgres>, user_id: Uuid) -> Result<()> {
+    sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+        .bind(user_id.to_string())
+        .execute(tx.as_mut())
+        .await?;
+    Ok(())
+}
+
+/// Wrapper: begin a transaction and immediately set the RLS context.
+pub async fn begin_with_rls(pool: &PgPool, user_id: Uuid) -> Result<Transaction<'_, Postgres>> {
+    let mut tx = pool.begin().await?;
+    set_rls_context(&mut tx, user_id).await?;
+    Ok(tx)
+}
+```
+
+```sql
+-- migrations/001_rls.sql
+-- ✅ RLS must be enabled on EVERY table that holds user or tenant data.
+-- FORCE ensures even the table owner cannot bypass the policy.
+
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY documents_user_isolation ON documents
+    FOR ALL TO app_user
+    USING (owner_id = current_setting('app.current_user_id')::uuid);
+```
+
+```rust
+// Usage: always go through begin_with_rls
+pub async fn get_documents(pool: &PgPool, user: &AuthUser) -> Result<Vec<Document>> {
+    let mut tx = begin_with_rls(pool, user.user_id).await?;
+    let docs = sqlx::query_as::<_, Document>(
+        "SELECT id, title, content FROM documents"
+        // No WHERE owner_id = $1 needed — RLS enforces it at DB level
+    )
+    .fetch_all(tx.as_mut())
+    .await?;
+    tx.commit().await?;
+    Ok(docs)
+}
+```
+
+### Example 7: SQL Injection Prevention with SQLx
 
 ```rust
 // src/db/user.rs
@@ -1059,16 +1151,17 @@ jobs:
 
 ## Best Practices
 
-1. **Always use parameterized queries**
-2. **Implement rate limiting on all endpoints**
-3. **Use Argon2id for password hashing**
-4. **Enable all security headers**
-5. **Validate all inputs at API boundary**
-6. **Use HTTPS/TLS in production**
-7. **Implement CSRF protection**
-8. **Use secure session management**
-9. **Log security events**
-10. **Regular security audits**
+1. **Enable PostgreSQL RLS on all user/tenant tables** — `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`; set `app.current_user_id` via `set_config` before every transaction
+2. **Always use parameterized queries**
+3. **Implement rate limiting on all endpoints**
+4. **Use Argon2id for password hashing**
+5. **Enable all security headers**
+6. **Validate all inputs at API boundary**
+7. **Use HTTPS/TLS in production**
+8. **Implement CSRF protection**
+9. **Use secure session management**
+10. **Log security events**
+11. **Regular security audits**
 
 ## Example Projects
 

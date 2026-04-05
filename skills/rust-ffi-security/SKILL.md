@@ -560,6 +560,53 @@ pub extern "C" fn copy_data_safe(
 - [ ] GIL released for long operations (Python)
 - [ ] Locks used for shared state
 
+### Database Access (PostgreSQL RLS)
+
+When FFI code (PyO3, Neon, UniFFI) calls into Rust that queries PostgreSQL:
+
+- [ ] `user_id` (or equivalent) passed through the FFI boundary into the Rust DB layer
+- [ ] `set_config('app.current_user_id', $1, true)` called within every transaction before any user-scoped query
+- [ ] PostgreSQL RLS policies enabled (`ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`) on all relevant tables
+- [ ] The DB connection pool does **not** use a superuser role (superusers bypass RLS unless `FORCE` is set; prefer `FORCE` + an `app_user` role)
+- [ ] Tests verify cross-user data isolation at the DB level, not just at the application layer
+
+```rust
+// Pattern: PyO3 function receiving user_id and setting RLS before querying
+#[pyfunction]
+pub fn fetch_user_documents(
+    py: Python<'_>,
+    user_id: &str,
+    pool: &PyAny,
+) -> PyResult<Vec<String>> {
+    // user_id comes from the authenticated Python session
+    let uid: uuid::Uuid = user_id.parse()
+        .map_err(|_| PyValueError::new_err("Invalid user_id"))?;
+
+    py.allow_threads(|| {
+        tokio::runtime::Handle::current().block_on(async {
+            let pool = get_pool(); // retrieve sqlx pool
+            let mut tx = pool.begin().await.map_err(|e| {
+                PyRuntimeError::new_err(e.to_string())
+            })?;
+            // ✅ Set RLS context — must happen before any query
+            sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+                .bind(uid.to_string())
+                .execute(tx.as_mut())
+                .await
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+
+            let docs: Vec<String> = sqlx::query_scalar("SELECT title FROM documents")
+                .fetch_all(tx.as_mut())
+                .await
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+
+            tx.commit().await.map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+            Ok(docs)
+        })
+    })
+}
+```
+
 ### Error Handling
 
 - [ ] Errors properly propagated

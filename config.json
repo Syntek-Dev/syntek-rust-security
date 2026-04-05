@@ -1,6 +1,6 @@
 {
   "name": "syntek-rust-security",
-  "version": "0.2.1",
+  "version": "1.1.0",
   "description": "Rust security tooling plugin for Claude Code",
   "pluginTools": [
     {

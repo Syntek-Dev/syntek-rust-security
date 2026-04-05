@@ -120,6 +120,7 @@ Generate a structured threat model including:
 5. Review dependency tree for supply chain risks
 6. Assess binary hardening measures
 7. Document all assumptions and constraints
+8. **Always include PostgreSQL RLS in the data flow analysis** — verify that `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY` is present on all tables with user or tenant data, and that the application sets the RLS session variable (`app.current_user_id`) within every transaction
 
 ## Example Threats
 
@@ -129,6 +130,9 @@ Generate a structured threat model including:
 - **FFI Boundary Violation**: Python/C FFI incorrectly assumes memory layout
 - **Panic Unwinding**: Panic in unsafe code leaves data in inconsistent state
 - **Resource Exhaustion**: Unbounded allocation from untrusted input
+- **RLS Bypass via Missing Context**: Application omits `set_config('app.current_user_id', ...)` before a query, causing RLS policies to evaluate against NULL and either block all access or (if misconfigured) return all rows
+- **RLS Bypass via Superuser Connection**: Application connects to PostgreSQL as a superuser or table owner without `FORCE ROW LEVEL SECURITY`, allowing all policies to be silently skipped
+- **Horizontal Privilege Escalation**: Application-layer RBAC is enforced but RLS is absent; a bug in one resolver exposes another user's rows
 
 ## Success Criteria
 

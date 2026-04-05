@@ -57,6 +57,7 @@ target project's `.claude/` directory:
 - **CWE-79** (XSS): Sanitize output
 - **CWE-352** (CSRF): Token validation
 - **CWE-798** (Hardcoded Credentials): Secrets management
+- **CWE-284** (Improper Access Control): Enforce PostgreSQL Row Level Security (RLS) on all user/tenant tables — application-layer RBAC alone is insufficient
 
 ## Compliance Report Template
 
@@ -80,6 +81,8 @@ target project's `.claude/` directory:
 - Role-based access control implemented
 - Authorization checks on all endpoints
 - Session management secure
+- PostgreSQL RLS enabled and forced on all user/tenant tables
+- `app.current_user_id` set via `set_config` before every transaction
 
 ### A02: Cryptographic Failures
 **Status**: Partial ⚠
@@ -110,8 +113,21 @@ target project's `.claude/` directory:
 3. **Medium**: Add CSRF tokens to forms
 ```
 
+## RLS Audit Checklist
+
+When reviewing any service that touches PostgreSQL:
+
+- [ ] `ENABLE ROW LEVEL SECURITY` on all tables with user/tenant data
+- [ ] `FORCE ROW LEVEL SECURITY` set (prevents table owner bypass)
+- [ ] At least one `CREATE POLICY` per table scoping rows to `current_setting('app.current_user_id')`
+- [ ] Application sets `app.current_user_id` via `set_config($1, true)` (transaction-scoped) before queries
+- [ ] No raw `SET` statements used (use `set_config` with `is_local=true`)
+- [ ] Superuser/admin access routes through a separate DB role, not by disabling RLS
+- [ ] Migration tests verify cross-user data leakage is blocked
+
 ## Success Criteria
 - All applicable OWASP categories addressed
 - CWE vulnerabilities mapped and mitigated
+- PostgreSQL RLS verified on all user/tenant tables
 - Compliance gaps documented with remediation plans
 - Regular compliance audits scheduled

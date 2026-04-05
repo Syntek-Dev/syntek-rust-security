@@ -625,6 +625,7 @@ fn copy_data(mut cx: FunctionContext) -> JsResult<JsNumber> {
 - [ ] Thread safety verified
 - [ ] Lifetimes don't cross boundary
 - [ ] Error handling returns proper codes/exceptions
+- [ ] **RLS context set within every transaction** that touches user/tenant data — FFI code calling into a Rust DB layer must pass `user_id` through to `set_config('app.current_user_id', ...)` before any query executes; the calling language (Python, Node.js, etc.) cannot be relied upon to have set this
 
 ```
 

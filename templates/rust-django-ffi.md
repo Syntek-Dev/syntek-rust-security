@@ -1033,8 +1033,71 @@ class TestSecureMemory:
         assert len(secure) == 0
 ```
 
+## Row Level Security (PostgreSQL)
+
+RLS must be enabled on all tables containing user or tenant data. This enforces
+data isolation at the database layer — independent of Django ORM, PyO3 bindings,
+or any application code.
+
+### Migration
+
+```sql
+-- migrations/0002_rls.sql
+ALTER TABLE django_app_secureuserprofile ENABLE ROW LEVEL SECURITY;
+ALTER TABLE django_app_secureuserprofile FORCE ROW LEVEL SECURITY;
+
+ALTER TABLE django_app_securedocument ENABLE ROW LEVEL SECURITY;
+ALTER TABLE django_app_securedocument FORCE ROW LEVEL SECURITY;
+
+-- Policy: each user can only access their own rows
+CREATE POLICY user_isolation ON django_app_secureuserprofile
+    FOR ALL TO app_user
+    USING (user_id = current_setting('app.current_user_id')::integer);
+
+CREATE POLICY user_isolation ON django_app_securedocument
+    FOR ALL TO app_user
+    USING (owner_id = current_setting('app.current_user_id')::integer);
+```
+
+### Django Middleware to Set RLS Context
+
+```python
+# django_app/middleware.py (add alongside RequestEncryptionMiddleware)
+from django.db import connection
+
+
+class RLSMiddleware:
+    """Set PostgreSQL session variable for Row Level Security on every request."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT set_config('app.current_user_id', %s, false)",
+                    [str(request.user.pk)],
+                )
+        return self.get_response(request)
+```
+
+```python
+# settings.py
+MIDDLEWARE = [
+    # Must come AFTER authentication middleware
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_app.middleware.RLSMiddleware",
+    "django_app.middleware.RequestEncryptionMiddleware",
+]
+```
+
 ## Security Checklist
 
+- [ ] PostgreSQL RLS enabled (`ENABLE ROW LEVEL SECURITY`) on all user/tenant tables
+- [ ] `FORCE ROW LEVEL SECURITY` set so table owner cannot bypass policies
+- [ ] `RLSMiddleware` sets `app.current_user_id` on every authenticated request
+- [ ] RLS migration runs before any data is inserted
 - [ ] Encryption keys stored securely (Vault, env vars, KMS)
 - [ ] Keys rotated periodically
 - [ ] AAD used for context binding where appropriate

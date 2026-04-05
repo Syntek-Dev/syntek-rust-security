@@ -1,7 +1,87 @@
 # Version History
 
-**Maintained By**: Development Team **Language**: British English (en_GB)
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
 **Timezone**: Europe/London
+
+---
+
+## Table of Contents
+
+- [Version 1.1.0 - 05/04/2026](#version-110---05042026)
+- [Version 1.0.0 - 15/03/2026](#version-100---15032026)
+- [Version 0.3.0 - 15/03/2026](#version-030---15032026)
+- [Version 0.2.1 - 24/02/2026](#version-021---24022026)
+- [Version 0.2.0 - 24/01/2026](#version-020---24012026)
+- [Version 0.1.0 - 10/01/2026](#version-010---10012026)
+
+---
+
+## Version 1.1.0 (05/04/2026)
+
+**Type**: Minor Release **Stability**: Stable **Breaking Changes**: None
+
+### Summary
+
+Adds PostgreSQL Row Level Security (RLS) requirements throughout the plugin.
+Agents, skills, templates, and commands that interact with database-backed
+applications now include RLS enforcement guidance. This ensures that projects
+built with this plugin apply fine-grained access control at the database layer
+for multi-tenant and GDPR-sensitive workloads.
+
+### Technical Details
+
+#### Files Changed
+
+| File | Changes |
+|------|---------|
+| `templates/rust-web-security.md` | Added RLS requirements for web security templates using PostgreSQL backends |
+| `templates/rust-django-ffi.md` | Added RLS enforcement patterns for Django-Rust FFI integrations |
+| `templates/rust-graphql-middleware.md` | Added RLS context-setting guidance for GraphQL resolvers |
+| `agents/security/compliance-auditor.md` | Added RLS policy audit checks to compliance review process |
+| `agents/security/threat-modeller.md` | Added RLS bypass to STRIDE threat considerations |
+| `agents/infrastructure/rust-gdpr.md` | Added RLS as a required data isolation mechanism for GDPR compliance |
+| `agents/security/ffi-security-reviewer.md` | Added RLS boundary validation for FFI layers touching PostgreSQL |
+| `agents/infrastructure/gunicorn-configurator.md` | Added RLS session variable configuration for Django/FastAPI deployments |
+| `skills/rust-web-security/SKILL.md` | Added RLS patterns to web security knowledge base |
+| `skills/rust-ffi-security/SKILL.md` | Added RLS boundary considerations to FFI security knowledge base |
+
+#### Security Coverage Added
+
+- **RLS Policy Enforcement**: Agents now verify that `SET LOCAL` and
+  `SET app.current_user_id` patterns are used consistently before query
+  execution in multi-tenant schemas.
+- **GDPR Data Isolation**: `rust-gdpr` agent now requires RLS as a
+  countermeasure for horizontal privilege escalation in multi-tenant databases.
+- **Threat Modelling**: Threat modeller now includes RLS bypass as a spoofing
+  and elevation-of-privilege threat in STRIDE analysis for PostgreSQL systems.
+- **FFI Boundaries**: FFI security reviewer checks that database connections
+  passed across language boundaries preserve the RLS session context.
+- **GraphQL Middleware**: Templates enforce RLS context injection before
+  resolver execution to prevent cross-tenant data leakage through the API layer.
+- **Gunicorn Configuration**: Secure session variable setup added to connection
+  pool initialisation for Django/FastAPI deployments.
+
+#### Configuration Changes
+
+No new configuration keys required. RLS guidance is applied at the code
+generation and review level within affected agents and templates.
+
+### Known Issues
+
+- None
+
+### Migration Guide
+
+No breaking changes. Existing projects continue to work without modification.
+Agents and templates updated in this release will now surface RLS guidance
+when reviewing or generating code for PostgreSQL-backed applications.
+
+### Contributors
+
+- Syntek Studio Development Team
 
 ---
 
@@ -550,8 +630,8 @@ This plugin follows [Semantic Versioning 2.0.0](https://semver.org/):
 ### Version Metadata
 
 ```
-VERSION: 1.0.0
-RELEASE_DATE: 2026-03-15
+VERSION: 1.1.0
+RELEASE_DATE: 2026-04-05
 STABILITY: stable
 RUST_MSRV: 1.92.0
 CLAUDE_CODE_VERSION: >=1.0.0

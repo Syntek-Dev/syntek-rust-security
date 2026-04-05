@@ -1,5 +1,13 @@
 # Contributing to Syntek Rust Security Plugin
 
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
+**Timezone**: Europe/London
+
+---
+
 Thank you for your interest in contributing to the Syntek Rust Security Plugin! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents

@@ -59,7 +59,62 @@ async fn require_role<B>(
 }
 ```
 
-### 2. SQL Injection Prevention
+### 2. Row Level Security (PostgreSQL)
+
+RLS enforces data isolation at the database layer. It applies regardless of
+which framework, ORM, or FFI layer issues the query.
+
+```sql
+-- Enable on every table with user-scoped data
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders FORCE ROW LEVEL SECURITY;  -- prevents owner bypass
+
+CREATE POLICY orders_user_isolation ON orders
+    FOR ALL TO app_user
+    USING (user_id = current_setting('app.current_user_id')::uuid);
+```
+
+```rust
+use sqlx::{PgPool, Postgres, Transaction};
+use uuid::Uuid;
+
+/// Must be called at the start of every transaction touching user data.
+pub async fn set_rls_context(
+    tx: &mut Transaction<'_, Postgres>,
+    user_id: Uuid,
+) -> Result<(), sqlx::Error> {
+    // is_local=true means the setting resets automatically when the
+    // transaction ends — safe for connection pool reuse
+    sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+        .bind(user_id.to_string())
+        .execute(tx.as_mut())
+        .await?;
+    Ok(())
+}
+```
+
+```rust
+// ✅ SECURE: RLS filters rows at DB level, no application-layer WHERE needed
+async fn list_user_orders(pool: &PgPool, user_id: Uuid) -> Result<Vec<Order>, Error> {
+    let mut tx = pool.begin().await?;
+    set_rls_context(&mut tx, user_id).await?;
+    let orders = sqlx::query_as::<_, Order>("SELECT * FROM orders")
+        .fetch_all(tx.as_mut())
+        .await?;
+    tx.commit().await?;
+    Ok(orders)
+}
+
+// ❌ VULNERABLE: Application-layer filter only — a bug silently exposes all rows
+async fn list_user_orders_unsafe(pool: &PgPool, user_id: Uuid) -> Result<Vec<Order>, Error> {
+    sqlx::query_as("SELECT * FROM orders WHERE user_id = $1")
+        .bind(user_id)
+        .fetch_all(pool)
+        .await
+}
+```
+
+### 3. SQL Injection Prevention
 
 ```rust
 use sqlx::{PgPool, query_as};
@@ -246,6 +301,7 @@ fn verify_password(password: &str, hash: &str) -> Result<bool, Error> {
 - ✅ Implement RBAC middleware
 - ✅ Verify user permissions on every request
 - ✅ Use type-safe session management
+- ✅ **Enable PostgreSQL RLS** (`ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`) on all user/tenant tables; set `app.current_user_id` via `set_config` at transaction start
 
 ### A02: Cryptographic Failures
 - ✅ Use Argon2 for password hashing
@@ -364,13 +420,14 @@ mod tests {
 
 ## Best Practices
 
-1. **Always use parameterized queries** - Prevent SQL injection
-2. **Hash passwords with Argon2** - Never MD5/SHA256
-3. **Enable HTTPS/TLS** - Use rustls or native-tls
-4. **Set security headers** - CSP, HSTS, X-Frame-Options
-5. **Validate all input** - Use validator crate
-6. **Implement CSRF protection** - For state-changing operations
-7. **Rate limit endpoints** - Prevent abuse
-8. **Log security events** - Authentication, authorization failures
-9. **Keep dependencies updated** - Run cargo-audit regularly
-10. **Use framework security features** - Don't roll your own
+1. **Enable PostgreSQL RLS on all user/tenant tables** — `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`; call `set_config('app.current_user_id', $1, true)` at the start of every transaction
+2. **Always use parameterized queries** - Prevent SQL injection
+3. **Hash passwords with Argon2** - Never MD5/SHA256
+4. **Enable HTTPS/TLS** - Use rustls or native-tls
+5. **Set security headers** - CSP, HSTS, X-Frame-Options
+6. **Validate all input** - Use validator crate
+7. **Implement CSRF protection** - For state-changing operations
+8. **Rate limit endpoints** - Prevent abuse
+9. **Log security events** - Authentication, authorization failures
+10. **Keep dependencies updated** - Run cargo-audit regularly
+11. **Use framework security features** - Don't roll your own

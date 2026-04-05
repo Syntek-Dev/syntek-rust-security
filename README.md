@@ -1,5 +1,13 @@
 # Syntek Rust Security Plugin
 
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
+**Timezone**: Europe/London
+
+---
+
 Comprehensive Rust security tooling for Claude Code - custom
 encryption/decryption systems, server security wrappers, infrastructure
 automation, and memory-safe development.

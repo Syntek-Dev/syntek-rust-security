@@ -1,5 +1,13 @@
 # Changelog
 
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
+**Timezone**: Europe/London
+
+---
+
 All notable changes to the Syntek Rust Security Plugin will be documented in
 this file.
 
@@ -7,11 +15,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
+## Table of Contents
+
+- [Unreleased](#unreleased)
+- [1.1.0 - 05/04/2026](#110---05042026)
+- [1.0.0 - 15/03/2026](#100---15032026)
+
+---
+
 ## [Unreleased]
 
 ### Added
 
-- Placeholder for future changes
+- Nothing yet
+
+---
+
+## [1.1.0] - 05/04/2026
+
+### Added
+
+- Row Level Security (PostgreSQL RLS) requirements added across agents, skills,
+  templates, and commands for projects using PostgreSQL backends
+- RLS enforcement patterns in `agents/security/compliance-auditor.md` and
+  `agents/security/threat-modeller.md`
+- RLS guidance in `agents/infrastructure/rust-gdpr.md` for GDPR-aligned
+  data isolation
+- RLS boundary considerations in `agents/security/ffi-security-reviewer.md`
+  for FFI integrations touching database layers
+- RLS configuration guidance in `agents/infrastructure/gunicorn-configurator.md`
+  for Django/FastAPI deployments
+- RLS patterns in `skills/rust-web-security/SKILL.md` and
+  `skills/rust-ffi-security/SKILL.md`
+- RLS requirements in `templates/rust-web-security.md`,
+  `templates/rust-django-ffi.md`, and `templates/rust-graphql-middleware.md`
+
+---
 
 ## [1.0.0] - 15/03/2026
 
@@ -234,7 +275,9 @@ and this project adheres to
   - Syntek Dev Suite integration guide
 
 [Unreleased]:
-  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.0.0...HEAD
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.1.0...HEAD
+[1.1.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.0.0...v1.1.0
 [1.0.0]:
   https://github.com/Syntek-Studio/syntek-rust-security/compare/v0.3.0...v1.0.0
 [0.3.0]:

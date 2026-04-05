@@ -20,12 +20,47 @@ target project's `.claude/` directory:
 | **[DATA-STRUCTURES.md](.claude/DATA-STRUCTURES.md)** | Rust data structures, newtype, domain modelling |
 | **[ENCRYPTION-GUIDE.md](.claude/ENCRYPTION-GUIDE.md)** | AES-256-GCM field encryption, HMAC tokens, key rotation |
 
+## Row Level Security Requirement
+
+**RLS is mandatory for GDPR compliance.** All tables containing personal data
+must have PostgreSQL Row Level Security enabled so that a data subject's rows
+cannot be accessed by another user's session, even if the application layer has
+a bug. This is a technical safeguard under GDPR Article 25 (Data Protection by
+Design and by Default).
+
+```sql
+-- Every table holding personal data requires this
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY personal_data_isolation ON user_profiles
+    FOR ALL TO app_user
+    USING (user_id = current_setting('app.current_user_id')::uuid);
+
+-- GDPR erasure also benefits from RLS: a DELETE with no WHERE clause
+-- will only delete the current user's rows, never someone else's
+```
+
+```rust
+// Always set RLS context before any personal data query
+pub async fn set_gdpr_context(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    user_id: uuid::Uuid,
+) -> Result<(), Error> {
+    sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+        .bind(user_id.to_string())
+        .execute(tx.as_mut())
+        .await?;
+    Ok(())
+}
+```
+
 ## GDPR Requirements
 
 ### Right to Access
 ```rust
 pub async fn get_user_data(user_id: UserId) -> Result<UserData, Error> {
-    // Return all data associated with user
+    // Return all data associated with user — RLS ensures only their rows are returned
     db.fetch_all_user_data(user_id).await
 }
 ```
@@ -71,6 +106,8 @@ pub async fn cleanup_expired_data() -> Result<(), Error> {
 ```
 
 ## Success Criteria
+- PostgreSQL RLS enabled and forced on all tables containing personal data
+- `app.current_user_id` set within every transaction before personal data queries
 - User data access API implemented
 - Data deletion functionality
 - Export in JSON format

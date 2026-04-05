@@ -1,6 +1,93 @@
 # Releases
 
+**Last Updated**: 05/04/2026
+**Version**: 1.1.0
+**Maintained By**: Development Team
+**Language**: British English (en_GB)
+**Timezone**: Europe/London
+
+---
+
 Official release information for syntek-rust-security plugin.
+
+---
+
+## v1.1.0 - Row Level Security Requirements (05 April 2026)
+
+**Release Type**: Minor
+**Stability**: Stable
+**Download**: [GitHub Releases](https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v1.1.0)
+
+### Highlights
+
+This release strengthens the plugin's database security coverage by adding
+PostgreSQL Row Level Security (RLS) requirements across agents, skills,
+templates, and commands.
+
+RLS is a PostgreSQL feature that enforces access control policies at the
+database row level, ensuring users can only see and modify the data they are
+permitted to access. For multi-tenant applications and systems that handle
+personal data, RLS is a critical defence against accidental data leakage.
+
+#### What's New
+
+**Database Access Control Built Into Your Workflow**
+
+Agents that generate or review code for PostgreSQL-backed applications now
+include RLS guidance as a standard requirement. When you use any of the
+following, you will receive RLS-aware output:
+
+- **Compliance Auditor** — audits your RLS policies alongside other
+  compliance checks
+- **Threat Modeller** — includes RLS bypass in STRIDE threat analysis
+- **GDPR Agent** — requires RLS as a data isolation mechanism for
+  multi-tenant personal data
+- **FFI Security Reviewer** — checks that database connections passed across
+  language boundaries preserve the RLS session context
+- **Gunicorn Configurator** — configures RLS session variables during
+  connection pool initialisation for Django and FastAPI deployments
+
+**Updated Templates and Skills**
+
+The following templates now generate RLS-aware code:
+
+- **Rust Web Security** — PostgreSQL query patterns include RLS context setup
+- **Django FFI Integration** — Django database connections set the required
+  session variables before queries
+- **GraphQL Middleware** — resolver templates inject RLS context before
+  executing queries to prevent cross-tenant data leakage
+
+The `rust-web-security` and `rust-ffi-security` skills have been updated with
+RLS patterns so all relevant agents draw on this knowledge automatically.
+
+#### Why This Matters
+
+Without RLS, a bug in application-level access control — such as a missing
+authorisation check or an incorrect query filter — can expose data across
+tenant boundaries. RLS moves this enforcement into the database engine itself,
+providing a last line of defence that is independent of application code.
+
+This is particularly important for:
+
+- Multi-tenant SaaS applications
+- Applications storing personal data subject to GDPR
+- Any system where different users must not see each other's data
+
+### Breaking Changes
+
+None. Existing projects and workflows continue to work without modification.
+
+### System Requirements
+
+- Claude Code >= 1.0.0
+- syntek-dev-suite >= 1.0.0
+- Rust >= 1.92.0
+
+### Documentation
+
+- [README.md](README.md) - Plugin overview
+- [CHANGELOG.md](CHANGELOG.md) - Full change history
+- [CLAUDE.md](CLAUDE.md) - Plugin configuration and agent reference
 
 ---
 

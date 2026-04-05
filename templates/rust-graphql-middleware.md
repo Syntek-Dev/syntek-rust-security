@@ -1177,8 +1177,74 @@ async fn test_role_guard_allows_admin() {
 }
 ```
 
+## Row Level Security (PostgreSQL)
+
+RLS must be enforced at the database layer on all tables queried by GraphQL
+resolvers. This prevents cross-user data leakage even if a resolver has a
+missing authorization guard.
+
+```sql
+-- migrations/001_rls.sql
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents FORCE ROW LEVEL SECURITY;
+
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY documents_user_isolation ON documents
+    FOR ALL TO app_user
+    USING (owner_id = current_setting('app.current_user_id')::uuid);
+
+-- Admins may read all rows via a separate high-privilege DB role,
+-- NOT by disabling RLS.
+```
+
+```rust
+// src/db/rls.rs — called inside every resolver that touches user data
+use sqlx::{Postgres, Transaction};
+use uuid::Uuid;
+
+pub async fn set_rls_context(
+    tx: &mut Transaction<'_, Postgres>,
+    user_id: Uuid,
+) -> async_graphql::Result<()> {
+    sqlx::query("SELECT set_config('app.current_user_id', $1, true)")
+        .bind(user_id.to_string())
+        .execute(tx.as_mut())
+        .await
+        .map_err(|e| async_graphql::Error::new(format!("RLS context error: {}", e)))?;
+    Ok(())
+}
+```
+
+```rust
+// src/schema/query.rs — resolver usage
+#[graphql(guard = "AuthGuard")]
+async fn documents(&self, ctx: &Context<'_>) -> Result<Vec<SecureDocument>> {
+    let security_ctx = ctx.data::<SecurityContext>()?;
+    let user_id = security_ctx.user_id.ok_or("Not authenticated")?;
+    let pool = ctx.data::<sqlx::PgPool>()?;
+
+    let mut tx = pool.begin().await?;
+    set_rls_context(&mut tx, user_id).await?;
+
+    // RLS policy filters rows — no WHERE owner_id clause needed in SQL
+    let docs = sqlx::query_as::<_, SecureDocument>(
+        "SELECT id, title, content FROM documents"
+    )
+    .fetch_all(tx.as_mut())
+    .await?;
+
+    tx.commit().await?;
+    Ok(docs)
+}
+```
+
 ## Security Checklist
 
+- [ ] PostgreSQL RLS enabled (`ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`) on all user/tenant tables
+- [ ] `set_rls_context` called at the start of every transaction in user-scoped resolvers
+- [ ] Admin access uses a separate DB role with elevated privileges, not by bypassing RLS
 - [ ] JWT tokens validated with proper algorithm
 - [ ] Role-based access control on all sensitive resolvers
 - [ ] Field-level encryption for sensitive data

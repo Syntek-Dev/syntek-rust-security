@@ -369,6 +369,28 @@ timeout = 30
 
 ```
 
+## Row Level Security Requirement
+
+When generating configuration for Django or FastAPI deployments that use
+PostgreSQL, always include the following in output and guidance:
+
+1. The application's database role must **not** be a PostgreSQL superuser — use
+   a restricted `app_user` role so `FORCE ROW LEVEL SECURITY` cannot be
+   bypassed.
+2. A Django middleware (or FastAPI dependency) must set
+   `app.current_user_id` via `SET LOCAL` or `set_config($1, true)` within
+   every request transaction before any ORM query that touches user-scoped
+   tables.
+3. All tables with user or tenant data must have `ENABLE ROW LEVEL SECURITY`
+   and `FORCE ROW LEVEL SECURITY` applied in migrations.
+
+```python
+# gunicorn.conf.py addition — document the RLS requirement
+# NOTE: The Django DATABASE['USER'] must be a restricted role, not postgres/superuser.
+# RLS policies on user-scoped tables require app.current_user_id to be set
+# per-transaction via RLSMiddleware before any ORM query.
+```
+
 ## Success Criteria
 
 - Optimal worker configuration
@@ -376,4 +398,5 @@ timeout = 30
 - Proper timeout settings
 - SSL/TLS support
 - Comprehensive logging
+- Database user is a restricted role (not superuser) to ensure RLS is honoured
 ```
