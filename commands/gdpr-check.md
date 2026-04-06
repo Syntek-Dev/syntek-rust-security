@@ -19,7 +19,7 @@
 
 Analyzes Rust applications for GDPR (General Data Protection Regulation) compliance. Identifies personal data processing, validates consent mechanisms, audits data retention policies, and ensures proper data subject rights implementation (access, rectification, erasure, portability).
 
-**Agent:** `rust-gdpr` (Opus - Legal/Regulatory Reasoning)
+**Agent:** `gdpr-check` (Opus - Legal/Regulatory Reasoning)
 
 ---
 

@@ -7,7 +7,7 @@
 Generates secure Gunicorn and Uvicorn configuration for Django and FastAPI
 applications with worker management, timeouts, and security settings.
 
-**Agent:** `gunicorn-configurator` (Sonnet - Standard Analysis)
+**Agent:** `gunicorn-config` (Sonnet - Standard Analysis)
 
 ---
 

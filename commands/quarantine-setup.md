@@ -7,7 +7,7 @@
 Configures file quarantine system with isolated storage, admin notifications,
 and restoration workflows for detected threats.
 
-**Agent:** `nas-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `nas-security-init` (Sonnet - Standard Analysis)
 
 ---
 

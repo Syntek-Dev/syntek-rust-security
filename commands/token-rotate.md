@@ -7,7 +7,7 @@
 Automates rotation of secrets, tokens, and API keys with zero-downtime
 deployment support, audit logging, and rollback capabilities.
 
-**Agent:** `token-rotator` (Sonnet - Standard Analysis)
+**Agent:** `token-rotate` (Sonnet - Standard Analysis)
 
 ---
 

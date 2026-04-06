@@ -8,7 +8,7 @@ Initialises a unified Rust AI API gateway supporting multiple providers
 (Anthropic, OpenAI, Gemini, Azure, Perplexity) with rate limiting, circuit
 breakers, and cost tracking.
 
-**Agent:** `ai-gateway-architect` (Opus - Deep Reasoning)
+**Agent:** `ai-gateway-setup` (Opus - Deep Reasoning)
 
 ---
 

@@ -19,7 +19,7 @@
 
 Performs expert-level cryptographic implementation review, analyzing encryption algorithms, key management, random number generation, side-channel resistance, and compliance with cryptographic best practices.
 
-**Agent:** `crypto-reviewer` (Opus - Expert Reasoning)
+**Agent:** `crypto-review` (Opus - Expert Reasoning)
 
 ---
 

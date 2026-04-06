@@ -7,7 +7,7 @@
 Performs comprehensive server security hardening, implementing CIS benchmarks,
 SSH hardening, kernel parameters, and service security.
 
-**Agent:** `server-hardener` (Opus - Deep Reasoning)
+**Agent:** `server-harden` (Opus - Deep Reasoning)
 
 ---
 

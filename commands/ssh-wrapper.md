@@ -7,7 +7,7 @@
 Generates a Rust SSH wrapper with comprehensive session logging, command
 filtering, and access control for secure remote access management.
 
-**Agent:** `ssh-wrapper-generator` (Sonnet - Standard Analysis)
+**Agent:** `ssh-wrapper` (Sonnet - Standard Analysis)
 
 ---
 

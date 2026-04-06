@@ -7,7 +7,7 @@
 Generates hardened systemd service files with sandboxing, capability
 restrictions, and resource limits for secure service deployment.
 
-**Agent:** `systemd-hardener` (Sonnet - Standard Analysis)
+**Agent:** `systemd-harden` (Sonnet - Standard Analysis)
 
 ---
 

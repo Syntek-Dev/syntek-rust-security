@@ -7,7 +7,7 @@
 Configures intrusion detection/prevention system with Snort/Suricata-compatible
 rules, alert management, and automated response.
 
-**Agent:** `intrusion-detector-builder` (Sonnet - Standard Analysis)
+**Agent:** `ids-setup` (Sonnet - Standard Analysis)
 
 ---
 

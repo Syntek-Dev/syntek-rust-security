@@ -19,7 +19,7 @@
 
 Analyzes compiled Rust binaries for security hardening features, anti-exploitation mechanisms, and binary security best practices. Verifies ASLR, DEP/NX, stack canaries, RELRO, PIE, and other runtime protections are properly enabled.
 
-**Agent:** `binary-analyser` (Sonnet - Standard Analysis)
+**Agent:** `binary-check` (Sonnet - Standard Analysis)
 
 ---
 

@@ -7,7 +7,7 @@
 Audits and hardens Docker container configurations, implementing security best
 practices for container isolation, resource limits, and runtime security.
 
-**Agent:** `docker-security` (Sonnet - Standard Analysis)
+**Agent:** `docker-harden` (Sonnet - Standard Analysis)
 
 ---
 

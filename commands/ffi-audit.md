@@ -8,7 +8,7 @@ Audits Foreign Function Interface (FFI) boundaries for security vulnerabilities,
 memory safety issues, and data handling problems in PyO3, Neon, UniFFI, and
 wasm-bindgen code.
 
-**Agent:** `ffi-security-reviewer` (Opus - Deep Reasoning)
+**Agent:** `ffi-audit` (Opus - Deep Reasoning)
 
 ---
 

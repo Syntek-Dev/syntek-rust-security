@@ -19,7 +19,7 @@
 
 Generates comprehensive test suites for Rust projects including unit tests, integration tests, property-based tests, doc tests, and security-focused tests. Follows TDD principles and ensures high code coverage with meaningful test cases.
 
-**Agent:** `rust-test-writer` (Sonnet - Standard Analysis)
+**Agent:** `write-tests` (Sonnet - Standard Analysis)
 
 ---
 

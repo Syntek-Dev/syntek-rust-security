@@ -7,7 +7,7 @@
 Generates secure Redis/Valkey configuration with authentication, TLS encryption,
 ACLs, and memory management for production deployments.
 
-**Agent:** `redis-configurator` (Sonnet - Standard Analysis)
+**Agent:** `redis-config` (Sonnet - Standard Analysis)
 
 ---
 

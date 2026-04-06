@@ -19,7 +19,7 @@
 
 Manages semantic versioning for Rust projects following SemVer 2.0.0 specification. Automatically updates version numbers in Cargo.toml, generates changelog entries, creates git tags, and ensures version consistency across workspaces and dependencies.
 
-**Agent:** `rust-version` (Sonnet - Standard Analysis)
+**Agent:** `version-bump` (Sonnet - Standard Analysis)
 
 ---
 

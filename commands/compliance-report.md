@@ -19,7 +19,7 @@
 
 Generates comprehensive security compliance reports mapped to industry standards including OWASP Top 10, CWE (Common Weakness Enumeration), CVSS scoring, NIST frameworks, and regulatory requirements. Provides audit-ready documentation for security assessments.
 
-**Agent:** `compliance-auditor` (Sonnet - Standard Analysis)
+**Agent:** `compliance-report` (Sonnet - Standard Analysis)
 
 ---
 

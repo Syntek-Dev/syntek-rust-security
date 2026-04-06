@@ -19,7 +19,7 @@
 
 Performs comprehensive memory safety analysis, auditing unsafe code blocks, raw pointer usage, FFI boundaries, and potential undefined behavior to ensure memory safety guarantees are maintained.
 
-**Agent:** `memory-auditor` (Sonnet - Standard Analysis)
+**Agent:** `memory-audit` (Sonnet - Standard Analysis)
 
 ---
 

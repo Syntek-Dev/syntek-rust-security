@@ -19,7 +19,7 @@
 
 Performs comprehensive vulnerability scanning of Rust dependencies using cargo-audit and cargo-deny, checking against the RustSec Advisory Database for known security vulnerabilities, unmaintained crates, and security best practices.
 
-**Agent:** `vuln-scanner` (Sonnet - Standard Analysis)
+**Agent:** `vuln-scan` (Sonnet - Standard Analysis)
 
 ---
 

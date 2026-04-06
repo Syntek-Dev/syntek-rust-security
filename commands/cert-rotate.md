@@ -7,7 +7,7 @@
 Manages Cloudflare Origin CA and Edge certificate rotation with automatic
 renewal, Vault storage, and zero-downtime deployment.
 
-**Agent:** `cert-manager` (Sonnet - Standard Analysis)
+**Agent:** `cert-rotate` (Sonnet - Standard Analysis)
 
 ---
 

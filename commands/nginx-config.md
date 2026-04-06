@@ -7,7 +7,7 @@
 Generates security-hardened Nginx configuration with TLS best practices, rate
 limiting, security headers, and WAF-like protections.
 
-**Agent:** `nginx-configurator` (Sonnet - Standard Analysis)
+**Agent:** `nginx-config` (Sonnet - Standard Analysis)
 
 ---
 

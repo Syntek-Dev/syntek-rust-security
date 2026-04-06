@@ -7,7 +7,7 @@
 Initialises a Rust homeserver security wrapper project with process monitoring,
 application firewall, rootkit detection, and host-level threat protection.
 
-**Agent:** `homeserver-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `homeserver-security-init` (Sonnet - Standard Analysis)
 
 ---
 

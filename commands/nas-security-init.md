@@ -7,7 +7,7 @@
 Initialises a Rust NAS security wrapper project with real-time file scanning,
 malware detection, ransomware protection, and file integrity monitoring.
 
-**Agent:** `nas-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `nas-security-init` (Sonnet - Standard Analysis)
 
 ---
 

@@ -19,7 +19,7 @@
 
 Sets up comprehensive fuzzing infrastructure for Rust projects using libFuzzer, AFL++, or honggfuzz. Automatically creates fuzz targets, configures corpus management, and establishes continuous fuzzing workflows to discover crashes, hangs, and edge cases.
 
-**Agent:** `fuzzer` (Sonnet - Standard Analysis)
+**Agent:** `fuzz-setup` (Sonnet - Standard Analysis)
 
 ---
 

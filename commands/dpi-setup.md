@@ -7,7 +7,7 @@
 Configures deep packet inspection engine with protocol dissection, content
 analysis, and traffic classification.
 
-**Agent:** `router-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `dpi-setup` (Opus - Deep Reasoning)
 
 ---
 

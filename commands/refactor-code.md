@@ -19,7 +19,7 @@
 
 Performs intelligent code refactoring for Rust projects with focus on improving security, ownership patterns, error handling, and code maintainability. Handles complex Rust-specific transformations including borrow checker optimizations and unsafe code elimination.
 
-**Agent:** `rust-refactor` (Opus - Complex Ownership Transformations)
+**Agent:** `refactor-code` (Opus - Complex Ownership Transformations)
 
 ---
 

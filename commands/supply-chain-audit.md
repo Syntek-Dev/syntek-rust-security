@@ -19,7 +19,7 @@
 
 Performs comprehensive supply chain security analysis on Rust dependencies. Analyzes dependency trust, license compliance, maintainer reputation, typosquatting risks, and transitive dependency vulnerabilities to protect against supply chain attacks.
 
-**Agent:** `supply-chain` (Sonnet - Standard Analysis)
+**Agent:** `supply-chain-audit` (Sonnet - Standard Analysis)
 
 ---
 

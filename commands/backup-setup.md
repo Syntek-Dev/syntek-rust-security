@@ -7,7 +7,7 @@
 Configures encrypted backup systems using Backblaze B2, with client-side
 encryption, incremental backups, and retention policies.
 
-**Agent:** `backup-manager` (Sonnet - Standard Analysis)
+**Agent:** `backup-setup` (Sonnet - Standard Analysis)
 
 ---
 

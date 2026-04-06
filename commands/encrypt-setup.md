@@ -8,7 +8,7 @@ Initialises custom encryption infrastructure for Rust applications, including
 envelope encryption, key derivation, and secure key storage patterns with
 HashiCorp Vault integration.
 
-**Agent:** `encryption-architect` (Opus - Deep Reasoning)
+**Agent:** `encrypt-setup` (Opus - Deep Reasoning)
 
 ---
 

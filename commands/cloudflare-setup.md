@@ -7,7 +7,7 @@
 Configures Cloudflare API integration for DNS management, Workers deployment, R2
 storage, and Origin/Edge certificate management via Rust.
 
-**Agent:** `cloudflare-manager` (Sonnet - Standard Analysis)
+**Agent:** `cloudflare-setup` (Sonnet - Standard Analysis)
 
 ---
 

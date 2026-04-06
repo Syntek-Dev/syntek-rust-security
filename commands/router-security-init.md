@@ -8,7 +8,7 @@ Initialises a Rust router security wrapper project with deep packet inspection,
 IDS/IPS capabilities, traffic filtering, and threat detection for DIY router
 appliances.
 
-**Agent:** `router-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `router-security-init` (Sonnet - Standard Analysis)
 
 ---
 

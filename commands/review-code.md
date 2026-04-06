@@ -19,7 +19,7 @@
 
 Performs comprehensive code review for Rust projects with security-first approach. Analyzes code for vulnerabilities, anti-patterns, performance issues, and adherence to Rust idioms. Provides detailed feedback with severity ratings and remediation suggestions.
 
-**Agent:** `rust-review` (Opus - Expert Code Review)
+**Agent:** `review-code` (Opus - Expert Code Review)
 
 ---
 

@@ -19,7 +19,7 @@
 
 Creates and runs performance benchmarks for Rust projects using criterion.rs. Generates statistical analysis of performance characteristics, identifies regressions, and provides optimization recommendations with security-aware performance testing.
 
-**Agent:** `rust-benchmarker` (Sonnet - Standard Analysis)
+**Agent:** `benchmark` (Sonnet - Standard Analysis)
 
 ---
 

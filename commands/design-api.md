@@ -19,7 +19,7 @@
 
 Designs secure, idiomatic Rust APIs following API design guidelines, type safety best practices, and security-first principles. Creates type-safe interfaces, implements builder patterns, and ensures API usability while maintaining security guarantees.
 
-**Agent:** `rust-api-designer` (Opus - Sophisticated API Design)
+**Agent:** `design-api` (Opus - Sophisticated API Design)
 
 ---
 

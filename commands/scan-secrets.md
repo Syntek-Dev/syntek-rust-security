@@ -19,7 +19,7 @@
 
 Scans Rust projects for hardcoded secrets, API keys, passwords, tokens, and sensitive credentials. Detects secrets in source code, configuration files, commit history, and dependency trees to prevent credential leaks and security breaches.
 
-**Agent:** `secrets-auditor` (Sonnet - Standard Analysis)
+**Agent:** `scan-secrets` (Sonnet - Standard Analysis)
 
 ---
 

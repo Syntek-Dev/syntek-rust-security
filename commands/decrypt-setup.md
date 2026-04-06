@@ -8,7 +8,7 @@ Initialises custom decryption infrastructure for Rust applications,
 complementing the encryption setup with secure decryption patterns, key
 retrieval, and authenticated decryption verification.
 
-**Agent:** `encryption-architect` (Opus - Deep Reasoning)
+**Agent:** `encrypt-setup` (Opus - Deep Reasoning)
 
 ---
 

@@ -19,7 +19,7 @@
 
 Analyzes and minimizes unsafe code in Rust projects. Identifies unnecessary unsafe blocks, suggests safe alternatives, audits remaining unsafe code for undefined behavior, and documents safety invariants for required unsafe code.
 
-**Agent:** `rust-unsafe-minimiser` (Opus - Deep Memory Safety Reasoning)
+**Agent:** `minimize-unsafe` (Opus - Deep Memory Safety Reasoning)
 
 ---
 

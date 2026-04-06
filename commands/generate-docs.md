@@ -19,7 +19,7 @@
 
 Generates comprehensive Rust documentation using rustdoc, including API docs, security guides, architecture diagrams, and example code. Creates doc tests, validates documentation coverage, and publishes to docs.rs or custom hosting.
 
-**Agent:** `rust-docs` (Sonnet - Standard Analysis)
+**Agent:** `generate-docs` (Sonnet - Standard Analysis)
 
 ---
 

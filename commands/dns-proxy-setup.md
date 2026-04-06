@@ -7,7 +7,7 @@
 Configures secure DNS proxy with DoH/DoT support, DNS sinkholing, ad/tracker
 blocking, and query logging.
 
-**Agent:** `dns-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `dns-proxy-setup` (Sonnet - Standard Analysis)
 
 ---
 

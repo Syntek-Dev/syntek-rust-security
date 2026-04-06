@@ -7,7 +7,7 @@
 Configures firewall rules using nftables or iptables via Rust bindings, with
 stateful packet filtering, rate limiting, and logging.
 
-**Agent:** `firewall-integrator` (Sonnet - Standard Analysis)
+**Agent:** `firewall-setup` (Sonnet - Standard Analysis)
 
 ---
 

@@ -7,7 +7,7 @@
 Audits Rust code for proper memory zeroisation of sensitive data, ensuring
 secrets are securely wiped from memory after use to prevent information leakage.
 
-**Agent:** `zeroize-auditor` (Opus - Deep Reasoning)
+**Agent:** `zeroize-audit` (Opus - Deep Reasoning)
 
 ---
 

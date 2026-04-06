@@ -8,7 +8,7 @@ Configures HashiCorp Vault integration for Rust applications, including client
 setup, authentication methods, secrets engines, and secure secret retrieval
 patterns.
 
-**Agent:** `vault-integrator` (Sonnet - Standard Analysis)
+**Agent:** `vault-setup` (Sonnet - Standard Analysis)
 
 ---
 

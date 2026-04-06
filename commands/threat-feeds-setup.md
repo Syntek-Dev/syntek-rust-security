@@ -7,7 +7,7 @@
 Configures threat intelligence feed integration with IP/domain blocklists, IOC
 management, and automated updates.
 
-**Agent:** `threat-intel-integrator` (Sonnet - Standard Analysis)
+**Agent:** `threat-feeds-setup` (Sonnet - Standard Analysis)
 
 ---
 

@@ -19,7 +19,7 @@
 
 Creates user-facing help documentation and support articles for Rust applications. Generates troubleshooting guides, FAQ entries, security best practices guides, and error message explanations tailored for end users.
 
-**Agent:** `rust-support-articles` (Sonnet - Standard Analysis)
+**Agent:** `write-support-article` (Sonnet - Standard Analysis)
 
 ---
 

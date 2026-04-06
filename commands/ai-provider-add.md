@@ -7,7 +7,7 @@
 Adds a new AI provider to an existing AI gateway, implementing the provider
 client, configuration, and routing.
 
-**Agent:** `ai-gateway-builder` (Sonnet - Standard Analysis)
+**Agent:** `ai-provider-add` (Sonnet - Standard Analysis)
 
 ---
 

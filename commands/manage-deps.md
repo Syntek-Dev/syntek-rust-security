@@ -19,7 +19,7 @@
 
 Manages Rust dependencies with security-first approach. Updates dependencies, optimizes feature flags, removes unused dependencies, analyzes bloat, and ensures minimal attack surface through dependency management.
 
-**Agent:** `rust-dependency-manager` (Sonnet - Standard Analysis)
+**Agent:** `manage-deps` (Sonnet - Standard Analysis)
 
 ---
 

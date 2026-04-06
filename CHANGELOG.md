@@ -1,7 +1,7 @@
 # Changelog
 
-**Last Updated**: 05/04/2026
-**Version**: 1.1.0
+**Last Updated**: 06/04/2026
+**Version**: 1.1.1
 **Maintained By**: Development Team
 **Language**: British English (en_GB)
 **Timezone**: Europe/London
@@ -20,6 +20,7 @@ and this project adheres to
 ## Table of Contents
 
 - [Unreleased](#unreleased)
+- [1.1.1 - 06/04/2026](#111---06042026)
 - [1.1.0 - 05/04/2026](#110---05042026)
 - [1.0.0 - 15/03/2026](#100---15032026)
 
@@ -30,6 +31,20 @@ and this project adheres to
 ### Added
 
 - Nothing yet
+
+---
+
+## [1.1.1] - 06/04/2026
+
+### Changed
+
+- Flattened `agents/` directory structure — all agents moved from `agents/security/`,
+  `agents/infrastructure/`, and `agents/setup/` subdirectories to `agents/` root
+- Renamed all 51 agent files to match their corresponding command names exactly,
+  eliminating duplicate entries in Claude Code's slash command autocomplete
+- Updated all `**Agent:**` references in 51 command files to use new agent names
+- Updated `agentConfiguration` in `config.json` with new agent names and added
+  all previously unlisted agents to the opus/sonnet model assignments
 
 ---
 

@@ -19,7 +19,7 @@
 
 Manages Git workflows for Rust projects including branch management, commit conventions, pull request creation, release tagging, and security-focused git history analysis. Ensures clean commit history and proper version control practices.
 
-**Agent:** `rust-git` (Sonnet - Standard Analysis)
+**Agent:** `git-workflow` (Sonnet - Standard Analysis)
 
 ---
 

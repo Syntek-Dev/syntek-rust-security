@@ -19,7 +19,7 @@
 
 Performs comprehensive STRIDE threat analysis on Rust projects to identify potential security vulnerabilities across six threat categories: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege.
 
-**Agent:** `threat-modeller` (Opus - Deep Reasoning)
+**Agent:** `threat-model` (Opus - Deep Reasoning)
 
 ---
 

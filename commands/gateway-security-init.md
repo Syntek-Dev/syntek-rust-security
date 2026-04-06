@@ -7,7 +7,7 @@
 Initialises a Rust internet gateway security wrapper project with HTTPS
 inspection, download scanning, phishing detection, and content filtering.
 
-**Agent:** `gateway-security-builder` (Sonnet - Standard Analysis)
+**Agent:** `gateway-security-init` (Sonnet - Standard Analysis)
 
 ---
 
