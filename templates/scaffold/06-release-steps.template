@@ -1,0 +1,173 @@
+# STEPS — 06-release-process
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> These steps are mandatory and must be followed in order.
+> A release cannot be undone once published to crates.io.
+> Read `code/workflows/06-release-process/CONTEXT.md` before beginning.
+
+---
+
+## Prerequisites
+
+- [ ] All planned changes for this release are merged to the main branch
+- [ ] `cargo test` passes on the main branch
+- [ ] `cargo clippy -- -D warnings` passes
+- [ ] `/vuln-scan` shows no critical or high vulnerabilities
+- [ ] You have determined the correct semver bump (PATCH / MINOR / MAJOR)
+
+---
+
+## Semver decision
+
+| Change type | Bump |
+|-------------|------|
+| Bug fixes only, no API change | PATCH |
+| New backwards-compatible functionality | MINOR |
+| Breaking API change (removed/renamed types, changed signatures) | MAJOR |
+
+When in doubt, choose MINOR over PATCH if any behaviour changed, even internally.
+
+---
+
+## Steps
+
+### Step 1 — Create a release branch
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b release/v{NEW_VERSION}
+```
+
+Replace `{NEW_VERSION}` with the new version number (e.g. `1.2.0`).
+
+---
+
+### Step 2 — Bump the version in `Cargo.toml`
+
+Edit `Cargo.toml`:
+
+```toml
+[package]
+version = "{NEW_VERSION}"
+```
+
+If this is a workspace, bump the version in the root `Cargo.toml` and any crates
+that are being released.
+
+---
+
+### Step 3 — Update `CHANGELOG.md`
+
+Move the `## [Unreleased]` section to a new versioned section:
+
+```markdown
+## [Unreleased]
+
+## [{NEW_VERSION}] — {DD/MM/YYYY}
+
+### Added
+- Feature X
+
+### Fixed
+- Bug Y
+
+### Changed
+- Behaviour Z (breaking change if MAJOR)
+```
+
+Ensure every user-visible change is listed. Do not include internal refactors that
+have no observable effect.
+
+---
+
+### Step 4 — Update `VERSION` file (if present)
+
+```bash
+echo "{NEW_VERSION}" > VERSION
+```
+
+---
+
+### Step 5 — Run the full test and audit suite
+
+```bash
+cargo test
+cargo test --doc
+cargo clippy -- -D warnings
+cargo fmt --check
+cargo doc --no-deps
+```
+
+All checks must pass. Do not proceed if any fail.
+
+Optionally run the security audit:
+
+```bash
+cargo audit
+cargo deny check
+```
+
+---
+
+### Step 6 — Commit the release changes
+
+```bash
+git add Cargo.toml CHANGELOG.md VERSION
+git commit -m "chore(release): bump version to {NEW_VERSION}"
+```
+
+---
+
+### Step 7 — Open and merge the release PR
+
+```bash
+gh pr create \
+  --title "chore(release): v{NEW_VERSION}" \
+  --body "Release v{NEW_VERSION}. See CHANGELOG.md for details." \
+  --base main
+```
+
+Wait for CI to pass, then merge.
+
+---
+
+### Step 8 — Tag the release
+
+After the PR is merged:
+
+```bash
+git checkout main
+git pull origin main
+git tag -a "v{NEW_VERSION}" -m "Release v{NEW_VERSION}"
+git push origin "v{NEW_VERSION}"
+```
+
+---
+
+### Step 9 — Publish to crates.io (if applicable)
+
+Only run this step if the crate is published:
+
+```bash
+cargo publish --dry-run   # verify first
+cargo publish
+```
+
+---
+
+### Step 10 — Create a GitHub release (optional)
+
+```bash
+gh release create "v{NEW_VERSION}" \
+  --title "v{NEW_VERSION}" \
+  --notes "$(sed -n '/^## \[{NEW_VERSION}\]/,/^## /p' CHANGELOG.md | head -n -1)"
+```
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this workflow complete.

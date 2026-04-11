@@ -1,0 +1,163 @@
+# STEPS — 01-new-module
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> These steps are mandatory. Do not skip or reorder steps.
+> Read `code/workflows/01-new-module/CONTEXT.md` before beginning.
+> Follow `code/docs/CODING-PRINCIPLES.md` throughout.
+
+---
+
+## Prerequisites
+
+- [ ] `code/workflows/01-new-module/CONTEXT.md` has been read
+- [ ] `code/docs/CODING-PRINCIPLES.md` has been read
+- [ ] The purpose of the new module is clearly defined
+- [ ] The module fits within a single domain concept (not multiple)
+
+---
+
+## Steps
+
+### Step 1 — Define the module's responsibility
+
+Write one sentence describing what this module does and what it does NOT do.
+If you cannot write it in one sentence, the module is too broad — split it.
+
+**Output**: A clear, single-sentence module responsibility statement.
+
+---
+
+### Step 2 — Identify the public API
+
+List the public types, traits, and functions this module will expose.
+Follow Rust API Guidelines:
+- Use `Result<T, E>` for fallible operations; never panic in library code
+- Prefer borrowing over ownership in function parameters
+- Name types by what they are, not how they are implemented
+
+**Output**: A list of public items with their signatures (can be pseudocode at this stage).
+
+---
+
+### Step 3 — Write the module file
+
+Create the module file at the appropriate path:
+
+```
+# For a flat module layout (preferred for small modules):
+src/{module_name}.rs
+
+# For a directory-based layout (use when module has sub-modules):
+src/{module_name}/mod.rs
+src/{module_name}/{submodule}.rs
+```
+
+Add the module declaration to `src/lib.rs` or `src/main.rs`:
+
+```rust
+pub mod {module_name};
+// or for private modules:
+mod {module_name};
+```
+
+**Constraints**:
+- Maximum 750 lines per source file (including comments)
+- All public items must have doc comments (`///`)
+- No `unwrap()` or `expect()` — use `?` operator or explicit error handling
+
+---
+
+### Step 4 — Write unit tests
+
+Add a `#[cfg(test)]` block at the bottom of the module file (or in a separate test file
+under `tests/`):
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_happy_path() {
+        // Arrange
+        // Act
+        // Assert
+    }
+
+    #[test]
+    fn test_error_case() {
+        // Test that errors are returned correctly, not panicked
+    }
+}
+```
+
+For security-critical or complex logic, add property-based tests:
+
+```rust
+use proptest::prelude::*;
+
+proptest! {
+    #[test]
+    fn property_test(input in any::<u32>()) {
+        // Assert invariants hold for all inputs
+    }
+}
+```
+
+**Output**: At least one happy-path test and one error-case test.
+
+---
+
+### Step 5 — Write doc comments and examples
+
+Every public item must have a doc comment. Use `# Examples` sections for the primary
+public API:
+
+```rust
+/// Short one-line description.
+///
+/// Longer explanation if needed. Describe what the function does,
+/// not how it is implemented.
+///
+/// # Errors
+///
+/// Returns `Err(...)` if [condition].
+///
+/// # Examples
+///
+/// ```
+/// use {{project_name}}::{module_name}::MyType;
+///
+/// let result = MyType::new("value")?;
+/// assert_eq!(result.value(), "value");
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
+pub fn my_function() -> Result<MyType, MyError> {
+    // ...
+}
+```
+
+**Output**: All public items documented. Doc tests pass (`cargo test --doc`).
+
+---
+
+### Step 6 — Run checks
+
+```bash
+cargo fmt
+cargo clippy -- -D warnings
+cargo test
+cargo test --doc
+cargo doc --no-deps
+```
+
+All checks must pass. Fix all clippy warnings — do not suppress with `#[allow(...)]`
+unless there is a documented reason.
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this workflow complete.

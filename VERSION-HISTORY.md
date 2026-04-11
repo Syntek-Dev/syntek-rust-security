@@ -1,7 +1,7 @@
 # Version History
 
-**Last Updated**: 05/04/2026
-**Version**: 1.1.0
+**Last Updated**: 11/04/2026
+**Version**: 1.2.0
 **Maintained By**: Development Team
 **Language**: British English (en_GB)
 **Timezone**: Europe/London
@@ -10,12 +10,103 @@
 
 ## Table of Contents
 
+- [Version 1.2.0 - 11/04/2026](#version-120---11042026)
 - [Version 1.1.0 - 05/04/2026](#version-110---05042026)
 - [Version 1.0.0 - 15/03/2026](#version-100---15032026)
 - [Version 0.3.0 - 15/03/2026](#version-030---15032026)
 - [Version 0.2.1 - 24/02/2026](#version-021---24022026)
 - [Version 0.2.0 - 24/01/2026](#version-020---24012026)
 - [Version 0.1.0 - 10/01/2026](#version-010---10012026)
+
+---
+
+## Version 1.2.0 (11/04/2026)
+
+**Type**: Minor Release **Stability**: Stable **Breaking Changes**: None
+
+### Summary
+
+Adds the `/scaffold` command and `scaffold` agent — a multi-layer Rust project
+scaffolding system that generates a three-layer documentation and workflow
+structure for Rust projects. Includes 20 new scaffold templates covering
+CONTEXT.md, STEPS.md, CHECKLIST.md, GAPS.md, and routing files. Also replaces
+all hardcoded user-specific paths in example files with portable equivalents.
+
+### Technical Details
+
+#### Files Changed
+
+| File | Changes |
+|------|---------|
+| `agents/scaffold.md` | New scaffold agent — 10-step workflow to generate three-layer project structure |
+| `commands/scaffold.md` | New user-facing `/scaffold` command documentation |
+| `config.json` | Added `"scaffold"` to `sonnetAgents` array; version bumped to `1.2.0` |
+| `templates/scaffold/claude-md.template` | `.claude/CLAUDE.md` routing file template |
+| `templates/scaffold/gaps.template` | GAPS.md pre-populated with 9 open workflow gaps |
+| `templates/scaffold/root-context.template` | Root CONTEXT.md template |
+| `templates/scaffold/workflow-context.template` | Generic workflow CONTEXT.md template |
+| `templates/scaffold/workflow-steps.template` | Generic STEPS.md skeleton |
+| `templates/scaffold/workflow-checklist.template` | Generic CHECKLIST.md skeleton |
+| `templates/scaffold/01-new-module-steps.template` | Steps for new-module workflow |
+| `templates/scaffold/01-new-module-checklist.template` | Checklist for new-module workflow |
+| `templates/scaffold/02-tdd-steps.template` | Steps for TDD workflow |
+| `templates/scaffold/02-tdd-checklist.template` | Checklist for TDD workflow |
+| `templates/scaffold/06-release-steps.template` | Steps for release workflow |
+| `templates/scaffold/06-release-checklist.template` | Checklist for release workflow |
+| `templates/scaffold/how-to-01-setup-steps.template` | Steps for setup how-to |
+| `templates/scaffold/how-to-01-setup-checklist.template` | Checklist for setup how-to |
+| `templates/scaffold/pm-05-review-steps.template` | Steps for PM review workflow |
+| `templates/scaffold/pm-05-review-checklist.template` | Checklist for PM review workflow |
+| `templates/scaffold/pm-06-audit-steps.template` | Steps for PM audit workflow |
+| `templates/scaffold/pm-06-audit-checklist.template` | Checklist for PM audit workflow |
+| `examples/server-infrastructure/ssh-wrapper/access_logger.rs` | Replaced `/home/alice`, `/home/bob`, `/home/test` with `/tmp/test-home` |
+| `examples/diy-appliances/nas-security/file_integrity.rs` | Replaced `/home/user/file.txt` with `/data/storage/file.txt` |
+
+#### New Feature: `/scaffold` Command and Agent
+
+The scaffold system generates a three-layer project structure:
+
+- **Layer 1 — `.claude/CLAUDE.md`**: Routing file that directs Claude to the
+  correct workflow, how-to, or PM document depending on the task
+- **Layer 2 — `docs/workflows/`**: Step-by-step workflow documents (STEPS.md +
+  CHECKLIST.md pairs) for development workflows such as new-module, TDD,
+  and release
+- **Layer 3 — `docs/how-to/` and `docs/pm/`**: Reference and project management
+  documents following the same STEPS.md + CHECKLIST.md structure
+
+A `GAPS.md` file is pre-populated with 9 open workflow gaps, tracking which
+workflows have not yet been defined for the project.
+
+A `CONTEXT.md` file at the project root provides a brief description of the
+project for all agents to load on every invocation.
+
+#### Path Portability Fixes
+
+Three example files contained hardcoded paths tied to a specific user account
+(`/home/alice`, `/home/bob`, `/home/user`). These have been replaced with
+paths that compile and run correctly on any machine:
+
+- `access_logger.rs` — test helper paths changed to `/tmp/test-home`
+- `file_integrity.rs` — test data path changed to `/data/storage/file.txt`
+- `scaffold.md` — example path uses `<user-home>` placeholder
+
+#### Configuration Changes
+
+- `config.json`: `"scaffold"` added to `sonnetAgents` array
+- `config.json`: `"version"` field updated to `"1.2.0"`
+
+### Known Issues
+
+- None
+
+### Migration Guide
+
+No breaking changes. Existing projects continue to work without modification.
+The `/scaffold` command is additive and does not modify existing project files.
+
+### Contributors
+
+- Syntek Studio Development Team
 
 ---
 
@@ -630,8 +721,8 @@ This plugin follows [Semantic Versioning 2.0.0](https://semver.org/):
 ### Version Metadata
 
 ```
-VERSION: 1.1.0
-RELEASE_DATE: 2026-04-05
+VERSION: 1.2.0
+RELEASE_DATE: 2026-04-11
 STABILITY: stable
 RUST_MSRV: 1.92.0
 CLAUDE_CODE_VERSION: >=1.0.0

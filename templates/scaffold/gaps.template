@@ -1,0 +1,54 @@
+# GAPS.md — Workflow Gap Register
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+**Plugin**: syntek-rust-security
+
+This file tracks workflow folders that contain `CONTEXT.md` but are missing `STEPS.md`
+or `CHECKLIST.md`. Claude MUST log gaps here before proceeding with incomplete workflows.
+
+---
+
+## Gap handling rule
+
+> If a workflow folder has only `CONTEXT.md`, Claude must:
+> 1. Log the gap here (if not already logged)
+> 2. Use `CONTEXT.md` alone as best-effort guidance
+> 3. Never generate and silently commit missing files without explicit user instruction
+
+To fill a gap: `/scaffold --fill-gaps <workflow-path>`
+
+---
+
+## Open gaps
+
+| Workflow path | Missing files | Priority | Notes |
+|---------------|---------------|----------|-------|
+| `code/workflows/03-security-hardening/` | `STEPS.md`, `CHECKLIST.md` | High | Links to /threat-model, /crypto-review, /memory-audit |
+| `code/workflows/04-api-design/` | `STEPS.md`, `CHECKLIST.md` | Medium | Use /design-api command; follows Rust API Guidelines |
+| `code/workflows/05-refactor/` | `STEPS.md`, `CHECKLIST.md` | Medium | Ownership/borrowing migrations; clippy-driven |
+| `how-to/workflows/02-git-workflow/` | `STEPS.md`, `CHECKLIST.md` | Medium | Branch strategy, commit format, PR process |
+| `how-to/workflows/03-versioning/` | `STEPS.md`, `CHECKLIST.md` | Medium | SemVer rules, cargo publish, VERSION file |
+| `project-management/workflows/01-architecture-decision/` | `STEPS.md`, `CHECKLIST.md` | Low | ADR format and approval process |
+| `project-management/workflows/02-sprint-planning/` | `STEPS.md`, `CHECKLIST.md` | Low | Sprint structure, story selection |
+| `project-management/workflows/03-story-writing/` | `STEPS.md`, `CHECKLIST.md` | Low | User story format, acceptance criteria |
+| `project-management/workflows/04-bug-report/` | `STEPS.md`, `CHECKLIST.md` | Low | Bug report template, severity matrix |
+
+---
+
+## Structural notes
+
+These are informational — not errors, no action required unless noted.
+
+| ID | Note |
+|----|------|
+| STRUCT-001 | `code/src/` is a navigation pointer — actual Rust source lives at the project root `src/` |
+| STRUCT-002 | `how-to/scripts/` is empty at scaffold time — add onboarding scripts as the project matures |
+
+---
+
+## Resolved gaps
+
+| Workflow path | Resolved date | How |
+|---------------|---------------|-----|
+| (none yet) | — | — |

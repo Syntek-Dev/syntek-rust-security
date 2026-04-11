@@ -1,7 +1,7 @@
 # Changelog
 
-**Last Updated**: 06/04/2026
-**Version**: 1.1.1
+**Last Updated**: 11/04/2026
+**Version**: 1.2.0
 **Maintained By**: Development Team
 **Language**: British English (en_GB)
 **Timezone**: Europe/London
@@ -20,6 +20,7 @@ and this project adheres to
 ## Table of Contents
 
 - [Unreleased](#unreleased)
+- [1.2.0 - 11/04/2026](#120---11042026)
 - [1.1.1 - 06/04/2026](#111---06042026)
 - [1.1.0 - 05/04/2026](#110---05042026)
 - [1.0.0 - 15/03/2026](#100---15032026)
@@ -31,6 +32,32 @@ and this project adheres to
 ### Added
 
 - Nothing yet
+
+---
+
+## [1.2.0] - 11/04/2026
+
+### Added
+
+- `/scaffold` command and `scaffold` agent — multi-layer Rust project
+  scaffolding system that generates a three-layer workflow structure (`.claude/`,
+  `docs/workflows/`, `docs/how-to/`, `docs/pm/`) with pre-populated CONTEXT.md,
+  STEPS.md, CHECKLIST.md, GAPS.md, and `.claude/CLAUDE.md` routing files
+- 20 new scaffold templates in `templates/scaffold/`: `claude-md.template`,
+  `gaps.template`, `root-context.template`, `workflow-context.template`,
+  `workflow-steps.template`, `workflow-checklist.template`, per-workflow STEPS
+  and CHECKLIST files for `01-new-module`, `02-tdd`, `06-release`,
+  `how-to-01-setup`, `pm-05-review`, and `pm-06-audit`
+- `scaffold` entry added to `sonnetAgents` array in `config.json`
+
+### Fixed
+
+- Hardcoded user-specific paths replaced with portable equivalents across
+  example files: `/home/alice`, `/home/bob`, `/home/test` replaced with
+  `/tmp/test-home` in `examples/server-infrastructure/ssh-wrapper/access_logger.rs`;
+  `/home/user/file.txt` replaced with `/data/storage/file.txt` in
+  `examples/diy-appliances/nas-security/file_integrity.rs`; `<user-home>`
+  placeholder used in `agents/scaffold.md` example path
 
 ---
 
@@ -290,7 +317,11 @@ and this project adheres to
   - Syntek Dev Suite integration guide
 
 [Unreleased]:
-  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.1.0...HEAD
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.2.0...HEAD
+[1.2.0]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.1.1...v1.2.0
+[1.1.1]:
+  https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.1.0...v1.1.1
 [1.1.0]:
   https://github.com/Syntek-Studio/syntek-rust-security/compare/v1.0.0...v1.1.0
 [1.0.0]:

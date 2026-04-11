@@ -1,0 +1,158 @@
+# STEPS — 02-tdd-cycle
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Red → Green → Refactor. Do not skip the refactor step.
+> Read `code/workflows/02-tdd-cycle/CONTEXT.md` and `code/docs/TESTING.md` before beginning.
+
+---
+
+## Prerequisites
+
+- [ ] `code/workflows/02-tdd-cycle/CONTEXT.md` has been read
+- [ ] `code/docs/TESTING.md` has been read
+- [ ] The feature to implement is clearly scoped (one behaviour at a time)
+- [ ] `cargo test` was passing before starting this cycle
+
+---
+
+## Steps
+
+### Step 1 — Write a failing test (Red)
+
+Write the smallest test that expresses the desired behaviour. The test must fail before
+any implementation exists.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_desired_behaviour() {
+        // Arrange — set up preconditions
+        let input = /* minimal valid input */;
+
+        // Act — call the function under test
+        let result = function_under_test(input);
+
+        // Assert — verify the outcome
+        assert_eq!(result, expected_output);
+    }
+}
+```
+
+**Run to confirm failure:**
+```bash
+cargo test test_desired_behaviour
+```
+
+Expected output: `FAILED` or compilation error. If the test passes without implementation,
+the test is wrong — revise it.
+
+**Output**: One failing test committed.
+
+---
+
+### Step 2 — Write the minimum implementation (Green)
+
+Write the simplest code that makes the test pass. Do not over-engineer.
+
+```rust
+pub fn function_under_test(input: InputType) -> OutputType {
+    // Minimum viable implementation
+}
+```
+
+**Run to confirm passing:**
+```bash
+cargo test test_desired_behaviour
+```
+
+Expected output: `ok`.
+
+Do NOT refactor yet. Do NOT add extra features. Green means green — nothing more.
+
+**Output**: Test passing. No other tests broken.
+
+---
+
+### Step 3 — Run all tests to confirm no regressions
+
+```bash
+cargo test
+```
+
+All tests must pass. If any regression is introduced, fix it before proceeding.
+
+---
+
+### Step 4 — Refactor (with tests staying green)
+
+Now improve the code quality while keeping all tests passing:
+
+- Extract functions if logic is repeated (Rule of Three: three similar lines → extract)
+- Improve naming for clarity
+- Remove dead code
+- Apply ownership and borrowing improvements
+- Check for unnecessary clones
+
+After each refactor step, run:
+
+```bash
+cargo test
+```
+
+Tests must stay green throughout. Commit each logical refactor separately.
+
+---
+
+### Step 5 — Add edge case and error tests
+
+Cover the non-happy paths:
+
+```rust
+#[test]
+fn test_empty_input() { /* ... */ }
+
+#[test]
+fn test_max_boundary() { /* ... */ }
+
+#[test]
+fn test_error_propagated() { /* ... */ }
+```
+
+For security-critical or complex functions, add property-based tests:
+
+```rust
+use proptest::prelude::*;
+
+proptest! {
+    #[test]
+    fn round_trip_property(input in any::<ValidInputType>()) {
+        // Assert invariant holds for all inputs
+        let result = function_under_test(input.clone());
+        assert_eq!(result.inverse(), input);
+    }
+}
+```
+
+---
+
+### Step 6 — Final checks
+
+```bash
+cargo fmt
+cargo clippy -- -D warnings
+cargo test
+cargo test --doc
+```
+
+All checks must pass.
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this workflow complete.

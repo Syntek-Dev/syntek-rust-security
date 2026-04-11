@@ -1,0 +1,44 @@
+# CHECKLIST — 02-tdd-cycle
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every item must be checked before this workflow is considered complete.
+
+---
+
+## Definition of done
+
+### Red phase
+- [ ] At least one failing test was written before any implementation
+- [ ] The failing test was committed (or at least run to confirm failure)
+
+### Green phase
+- [ ] The minimum implementation was written to make the test pass
+- [ ] No additional features were added during the green phase
+
+### Refactor phase
+- [ ] Code was refactored for clarity, removing duplication and improving naming
+- [ ] Tests remained green throughout every refactor step
+- [ ] Refactor commits are separate from implementation commits
+
+### Test coverage
+- [ ] Happy-path test present
+- [ ] Error/edge-case tests present
+- [ ] Property-based tests added for security-critical or complex logic
+- [ ] `cargo test --doc` passes (doc examples are valid)
+
+### Code quality
+- [ ] `cargo fmt --check` passes
+- [ ] `cargo clippy -- -D warnings` passes (zero warnings)
+- [ ] `cargo test` passes (all tests green, no regressions)
+- [ ] No `unwrap()` or `expect()` in non-test production code
+
+### Safety
+- [ ] No new `unsafe` blocks without a `// SAFETY:` comment
+
+---
+
+## Sign-off
+
+- [ ] This TDD cycle is complete and all items above are checked

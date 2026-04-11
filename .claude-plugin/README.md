@@ -1,7 +1,7 @@
 # .claude-plugin
 
-**Last Updated**: 05/04/2026
-**Version**: 1.1.0
+**Last Updated**: 11/04/2026
+**Version**: 1.2.0
 **Maintained By**: Syntek Studio
 **Language**: British English (en_GB)
 **Timezone**: Europe/London

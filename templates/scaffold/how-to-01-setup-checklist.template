@@ -1,0 +1,49 @@
+# CHECKLIST — 01-setup
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every item must be checked before setup is considered complete.
+
+---
+
+## Definition of done
+
+### Rust toolchain
+- [ ] `rustup show` confirms stable toolchain is active
+- [ ] Rust version is ≥ {{rust_version}}: `rustc --version`
+- [ ] Nightly toolchain installed (required for `cargo-fuzz`): `rustup install nightly`
+
+### Required tools
+- [ ] `cargo audit` installed and working: `cargo audit --version`
+- [ ] `cargo deny` installed and working: `cargo deny --version`
+- [ ] `cargo geiger` installed and working: `cargo geiger --version`
+- [ ] `cargo semver-checks` installed: `cargo semver-checks --version`
+- [ ] `cargo fuzz` installed (nightly): `cargo +nightly fuzz --version`
+
+### Repository
+- [ ] Repository cloned via SSH (not HTTPS)
+- [ ] `git remote -v` shows the correct remote URL
+- [ ] On the correct branch (usually `main`)
+
+### Build and tests
+- [ ] `cargo build` succeeds with no errors
+- [ ] `cargo test` passes with all tests green
+- [ ] `cargo clippy -- -D warnings` passes
+
+### Plugin tools (if applicable)
+- [ ] `.claude/plugins/` built: `cd .claude/plugins && cargo build --release`
+
+### Security baseline
+- [ ] `cargo audit` run — findings reviewed (not necessarily zero)
+- [ ] `cargo deny check` run — findings reviewed
+
+### Editor
+- [ ] `rust-analyzer` LSP working in the editor
+- [ ] Code completion and diagnostics functioning
+
+---
+
+## Sign-off
+
+- [ ] Setup is complete and all applicable items above are checked

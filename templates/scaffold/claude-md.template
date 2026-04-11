@@ -1,0 +1,135 @@
+# {{project_name}} — Claude Code Configuration
+
+**Last Updated**: {{current_date}}
+**Project**: {{project_name}}
+**Type**: {{project_type}}
+**Edition**: {{edition}} | **MSRV**: {{rust_version}}
+
+---
+
+## Project Overview
+
+{{project_description}}
+
+---
+
+## MCP Servers
+
+| Server | Scope | Purpose |
+|--------|-------|---------|
+| `context7` | Global | Fetch current library and framework documentation |
+| `docfork` | Global | Search and browse community documentation |
+| `claude-chrome` | Global | Browser automation for testing and screenshots |
+| `code-review-graph` | Local | Code graph analysis for dependency and call-graph queries |
+
+> **Note**: `code-review-graph` requires local setup. See `how-to/docs/DEVELOPMENT.md`.
+
+---
+
+## Naming Conventions
+
+| Entity | Convention | Example |
+|--------|-----------|---------|
+| Files and folders | `kebab-case` | `auth-middleware.rs`, `api-design/` |
+| Rust functions and variables | `snake_case` | `parse_request`, `user_id` |
+| Rust types and traits | `PascalCase` | `AuthService`, `Encryptable` |
+| Rust constants | `SCREAMING_SNAKE_CASE` | `MAX_RETRIES`, `DEFAULT_TIMEOUT` |
+| Rust modules | `snake_case` | `mod crypto_utils` |
+| Workflow folders | `NN-kebab-description` | `01-new-module`, `05-code-review` |
+| ADR files | `ADR-NNNN-kebab-title.md` | `ADR-0001-use-axum.md` |
+
+---
+
+## Routing Rules
+
+When asked to perform a task, consult the relevant folder and workflow first.
+Read `CONTEXT.md` for decision-making. Only enter `STEPS.md` when the workflow is
+explicitly triggered.
+
+| Task | Consult first |
+|------|--------------|
+| Add a new Rust module | `code/workflows/01-new-module/CONTEXT.md` |
+| Write tests before implementation | `code/workflows/02-tdd-cycle/CONTEXT.md` |
+| Apply security patterns | `code/workflows/03-security-hardening/CONTEXT.md` |
+| Design a public API | `code/workflows/04-api-design/CONTEXT.md` |
+| Refactor existing code | `code/workflows/05-refactor/CONTEXT.md` |
+| Cut a new release | `code/workflows/06-release-process/CONTEXT.md` |
+| Set up the project for first time | `how-to/workflows/01-setup/CONTEXT.md` |
+| Make a commit or open a PR | `how-to/workflows/02-git-workflow/CONTEXT.md` |
+| Bump a version | `how-to/workflows/03-versioning/CONTEXT.md` |
+| Make an architectural decision | `project-management/workflows/01-architecture-decision/CONTEXT.md` |
+| Plan a sprint | `project-management/workflows/02-sprint-planning/CONTEXT.md` |
+| Write a user story | `project-management/workflows/03-story-writing/CONTEXT.md` |
+| File a bug report | `project-management/workflows/04-bug-report/CONTEXT.md` |
+| Review a pull request | `project-management/workflows/05-code-review/CONTEXT.md` |
+| Run a security audit | `project-management/workflows/06-security-audit/CONTEXT.md` |
+| Write Rust code | `code/docs/CODING-PRINCIPLES.md` |
+| Write or run tests | `code/docs/TESTING.md` |
+| Benchmark or profile | `code/docs/PERFORMANCE.md` |
+| Understand the dev workflow | `how-to/docs/DEVELOPMENT.md` |
+| Define security policy | `project-management/docs/SECURITY.md` |
+| Design a REST or async API | `project-management/docs/API-DESIGN.md` |
+| Choose an architectural pattern | `project-management/docs/ARCHITECTURE-PATTERNS.md` |
+| Model domain data | `project-management/docs/DATA-STRUCTURES.md` |
+{{#if has_crypto}}| Implement encryption | `how-to/docs/ENCRYPTION-GUIDE.md` |{{/if}}
+{{#if has_ffi}}| FFI boundary security | `code/docs/CODING-PRINCIPLES.md` (FFI section) |{{/if}}
+
+---
+
+## Skills, Commands, and Plugins Rules
+
+1. **Check this file first** — before generating any new skill, command, or plugin,
+   verify one does not already exist here or in `syntek-rust-security`.
+
+2. **Propose before generating** — if a new skill/command/plugin is needed, propose it
+   to the user before generating it.
+
+3. **Register on approval** — once approved, add it to this file under the relevant section.
+
+4. **Distinguish ephemeral vs. promoted** — single-use commands are ephemeral and not
+   registered here. Reusable, reviewed skills are promoted and registered.
+
+### Available commands (via syntek-rust-security plugin)
+
+Security: `/vuln-scan`, `/crypto-review`, `/memory-audit`, `/threat-model`, `/scan-secrets`,
+`/supply-chain-audit`, `/binary-check`, `/compliance-report`, `/pentest-tools`, `/fuzz-setup`
+
+Cryptography: `/encrypt-setup`, `/decrypt-setup`, `/zeroize-audit`, `/minimize-unsafe`, `/ffi-audit`
+
+Infrastructure: `/vault-setup`, `/token-rotate`, `/ssh-wrapper`, `/cert-rotate`,
+`/cloudflare-setup`, `/docker-harden`, `/backup-setup`, `/firewall-setup`, `/server-harden`
+
+AI Gateway: `/ai-gateway-setup`, `/ai-provider-add`
+
+Server Stack: `/nginx-config`, `/gunicorn-config`, `/redis-config`, `/systemd-harden`
+
+Code Quality: `/review-code`, `/refactor-code`, `/design-api`, `/write-tests`,
+`/benchmark`, `/generate-docs`, `/version-bump`, `/git-workflow`, `/manage-deps`
+
+---
+
+## Gap Registration Rule
+
+If Claude encounters a workflow folder that contains only `CONTEXT.md` and is missing
+`STEPS.md` or `CHECKLIST.md`, Claude MUST:
+
+1. Log the gap in `/GAPS.md` at the project root with the missing file path and a
+   suggested one-line description of what the file should contain
+2. Proceed using `CONTEXT.md` alone as best-effort guidance
+3. Never generate and silently commit missing workflow files without explicit user instruction
+
+To fill a gap: `/scaffold --fill-gaps <workflow-path>`
+
+---
+
+## Required Reading
+
+All agents MUST read the following documents before writing, reviewing, or refactoring
+any code in this project:
+
+| Document | Location | Purpose |
+|----------|----------|---------|
+| `CODING-PRINCIPLES.md` | `code/docs/` or `.claude/` | Coding standards, error handling, unsafe code |
+| `TESTING.md` | `code/docs/` or `.claude/` | Testing patterns, coverage thresholds |
+| `SECURITY.md` | `project-management/docs/` or `.claude/` | Memory safety, crypto standards |
+| `DEVELOPMENT.md` | `how-to/docs/` or `.claude/` | Dev workflow, toolchain, git conventions |

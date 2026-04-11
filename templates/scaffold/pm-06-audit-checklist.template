@@ -1,0 +1,55 @@
+# CHECKLIST — 06-security-audit
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every applicable item must be checked before this audit is considered complete.
+> Critical and High findings must be resolved — not deferred — before sign-off.
+
+---
+
+## Definition of done
+
+### Dependency scan
+- [ ] `cargo audit` run — all Critical/High findings resolved
+- [ ] `cargo deny check` run — licences, bans, and advisories clean
+
+### Unsafe code
+- [ ] `cargo geiger` run — unsafe count reviewed
+- [ ] All `unsafe` blocks have `// SAFETY:` comments
+- [ ] Unsafe surface area is minimised
+
+### Cryptography (if applicable)
+- [ ] Only approved algorithms in use
+- [ ] No banned algorithms present
+- [ ] Keys retrieved from Vault/environment (never hardcoded)
+- [ ] Nonces generated with CSPRNG
+- [ ] Constant-time comparisons used where required
+- [ ] Secrets zeroised on drop
+
+### Secrets
+- [ ] `/rust-security:scan-secrets` run — zero secrets committed
+
+### Supply chain
+- [ ] `/rust-security:supply-chain-audit` run — findings reviewed
+- [ ] New or changed dependencies reviewed for legitimacy
+
+### Threat model
+- [ ] `/rust-security:threat-model` run — new threats identified
+- [ ] All STRIDE categories addressed
+
+### Compliance report
+- [ ] Compliance report generated and saved to `project-management/src/`
+- [ ] All findings logged with severity, CWE mapping, and tracking issue
+
+### Remediation
+- [ ] All Critical findings resolved
+- [ ] All High findings resolved
+- [ ] Medium and Low findings tracked in issues with resolution targets
+
+---
+
+## Sign-off
+
+- [ ] This security audit is complete and all applicable items above are checked
+- [ ] Audit report saved to `project-management/src/security-audit-{{current_date}}.md`

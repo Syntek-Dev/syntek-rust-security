@@ -1,0 +1,144 @@
+# STEPS — 01-setup
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Follow these steps when setting up the project for the first time, or after a
+> major toolchain change.
+> Read `how-to/workflows/01-setup/CONTEXT.md` before beginning.
+
+---
+
+## Prerequisites
+
+None — this workflow installs the prerequisites.
+
+---
+
+## Steps
+
+### Step 1 — Install Rust toolchain
+
+Install Rust via rustup (https://rustup.rs) if not already installed:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Ensure the correct stable toolchain is active:
+
+```bash
+rustup install stable
+rustup default stable
+rustup show   # confirm version >= {{rust_version}}
+```
+
+---
+
+### Step 2 — Install required cargo tools
+
+```bash
+# Vulnerability scanning
+cargo install cargo-audit --locked
+cargo install cargo-deny --locked
+
+# Unsafe code analysis
+cargo install cargo-geiger --locked
+
+# Semver compatibility checking
+cargo install cargo-semver-checks --locked
+
+# Coverage (optional but recommended)
+cargo install cargo-tarpaulin --locked
+```
+
+For fuzzing (requires nightly):
+
+```bash
+rustup install nightly
+cargo +nightly install cargo-fuzz --locked
+```
+
+---
+
+### Step 3 — Clone the repository
+
+Obtain the repository URL from your team (GitHub, GitLab, Gitea, or self-hosted).
+Always clone via SSH for write access:
+
+```bash
+git clone git@<your-git-host>:<org>/{{project_name}}.git
+cd {{project_name}}
+```
+
+If you only need read access, HTTPS cloning also works:
+
+```bash
+git clone https://<your-git-host>/<org>/{{project_name}}.git
+```
+
+If you need to set up an SSH key, refer to your hosting provider's documentation
+or your organisation's onboarding guide.
+
+---
+
+### Step 4 — Build the project
+
+```bash
+cargo build
+```
+
+Confirm the build succeeds with no errors.
+
+---
+
+### Step 5 — Run the test suite
+
+```bash
+cargo test
+```
+
+All tests must pass on a clean checkout. If any fail, raise a bug before continuing.
+
+---
+
+### Step 6 — Build the plugin tools (if using syntek-rust-security plugin)
+
+If `.claude/plugins/` exists in the project:
+
+```bash
+cd .claude/plugins
+cargo build --release
+cd ../..
+```
+
+---
+
+### Step 7 — Run the initial security scan
+
+```bash
+cargo audit                  # check for known vulnerabilities
+cargo deny check             # check licences and bans
+cargo geiger --quiet         # count unsafe blocks
+```
+
+Review any findings and raise issues as appropriate before starting development.
+
+---
+
+### Step 8 — Verify your editor is configured
+
+Recommended: VS Code with the `rust-analyzer` extension, or any editor with
+`rust-analyzer` LSP support.
+
+Check `rust-analyzer` is working:
+
+```bash
+rustup component add rust-analyzer
+```
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this workflow complete.

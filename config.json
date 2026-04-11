@@ -1,6 +1,6 @@
 {
   "name": "syntek-rust-security",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Rust security tooling plugin for Claude Code",
   "pluginTools": [
     {
@@ -124,7 +124,8 @@
       "ids-setup",
       "dns-proxy-setup",
       "threat-feeds-setup",
-      "init"
+      "init",
+      "scaffold"
     ]
   },
   "skillConfiguration": {

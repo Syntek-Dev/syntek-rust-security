@@ -1,0 +1,61 @@
+# STEPS — {{workflow_number}}-{{workflow_name}}
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> These steps are mandatory. Do not skip or reorder steps.
+> Read the corresponding `CONTEXT.md` before beginning.
+
+---
+
+## Prerequisites
+
+- [ ] `CONTEXT.md` for this workflow has been read
+- [ ] All prerequisite tools are installed (see `how-to/workflows/01-setup/`)
+- [ ] Relevant guiding docs have been read
+
+---
+
+## Steps
+
+### Step 1 — [First step title]
+
+[Description of what to do in this step. Be specific — no improvisation.]
+
+```bash
+# Example command if applicable
+```
+
+**Output**: What this step produces.
+
+---
+
+### Step 2 — [Second step title]
+
+[Description]
+
+---
+
+### Step 3 — [Third step title]
+
+[Description]
+
+---
+
+### Step N — Verify
+
+Run the project's test suite and linter to confirm nothing is broken:
+
+```bash
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test
+```
+
+All checks must pass before proceeding to the `CHECKLIST.md`.
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this workflow complete.

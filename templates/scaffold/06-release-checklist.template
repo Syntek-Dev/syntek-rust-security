@@ -1,0 +1,59 @@
+# CHECKLIST — 06-release-process
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every item must be checked before this release is considered complete.
+> A release to crates.io cannot be undone.
+
+---
+
+## Definition of done
+
+### Pre-release
+- [ ] All planned changes merged to main branch
+- [ ] Correct semver bump determined (PATCH / MINOR / MAJOR)
+- [ ] Release branch created: `release/v{version}`
+
+### Version bump
+- [ ] `Cargo.toml` version updated
+- [ ] `VERSION` file updated (if present)
+- [ ] All workspace crate versions consistent
+
+### Changelog
+- [ ] `CHANGELOG.md` updated with versioned section
+- [ ] All user-visible changes documented (features, fixes, breaking changes)
+- [ ] Date set to today's date in `DD/MM/YYYY` format
+- [ ] `## [Unreleased]` section is empty/reset for next release
+
+### Tests and quality
+- [ ] `cargo test` passes (all tests green)
+- [ ] `cargo test --doc` passes
+- [ ] `cargo clippy -- -D warnings` passes (zero warnings)
+- [ ] `cargo fmt --check` passes
+- [ ] `cargo doc --no-deps` builds without errors
+
+### Security
+- [ ] `cargo audit` shows no critical or high vulnerabilities
+- [ ] `cargo deny check` passes
+
+### Git
+- [ ] Release commit created: `chore(release): bump version to vX.Y.Z`
+- [ ] Release PR opened, reviewed, and merged to main
+- [ ] Git tag created: `vX.Y.Z`
+- [ ] Tag pushed to remote
+
+### Publish (if applicable)
+- [ ] `cargo publish --dry-run` succeeded
+- [ ] `cargo publish` succeeded
+- [ ] Published version visible on crates.io
+
+### Post-release
+- [ ] GitHub release created (optional but recommended)
+- [ ] Dependent projects notified of breaking changes (MAJOR releases only)
+
+---
+
+## Sign-off
+
+- [ ] This release is complete and all applicable items above are checked

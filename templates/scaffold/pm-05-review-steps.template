@@ -1,0 +1,131 @@
+# STEPS — 05-code-review
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Follow these steps when reviewing any pull request against the main branch.
+> Read `project-management/workflows/05-code-review/CONTEXT.md` before beginning.
+> Reference `code/docs/CODING-PRINCIPLES.md` and `project-management/docs/SECURITY.md`
+> throughout.
+
+---
+
+## Prerequisites
+
+- [ ] PR is open and CI has run (check the status checks)
+- [ ] `code/docs/CODING-PRINCIPLES.md` has been read recently
+- [ ] `project-management/docs/SECURITY.md` has been read recently
+
+---
+
+## Steps
+
+### Step 1 — Understand the change
+
+Read the PR description and linked issue/story. Confirm:
+- The purpose of the change is clear
+- The scope matches the linked ticket (no scope creep)
+- Any breaking changes are flagged in the description
+
+If the description is unclear, request clarification before reviewing the diff.
+
+---
+
+### Step 2 — Run automated checks
+
+```bash
+# Checkout the PR branch
+git fetch origin
+git checkout {pr-branch}
+
+# Run all checks
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test
+cargo test --doc
+```
+
+If any automated check fails, leave a review comment requesting a fix before
+proceeding with the manual review.
+
+---
+
+### Step 3 — Review for correctness
+
+Read each changed file carefully:
+
+- Does the logic do what the description says?
+- Are edge cases handled?
+- Are error paths correct (no silent failures)?
+- Are panics (`unwrap`, `expect`) absent in library code?
+- Are `Result` and `Option` used appropriately?
+
+Leave inline comments for any correctness issues found.
+
+---
+
+### Step 4 — Review for security
+
+Using `project-management/docs/SECURITY.md` as a reference, check:
+
+**Unsafe code**
+- [ ] Any new `unsafe` blocks have a `// SAFETY:` comment explaining invariants
+- [ ] Unsafe surface area is minimised
+- [ ] FFI boundaries validate all inputs
+
+**Cryptography** (if applicable)
+- [ ] Only approved algorithms used (AES-256-GCM, ChaCha20-Poly1305, SHA-256, Ed25519)
+- [ ] No banned algorithms (MD5, SHA-1, ECB mode, DES)
+- [ ] Keys not hardcoded; retrieved from Vault or environment
+- [ ] Constant-time comparisons used where timing attacks are possible
+
+**Secrets and credentials**
+- [ ] No secrets or credentials committed to the repository
+- [ ] No sensitive data in log statements
+
+**Input validation**
+- [ ] All external inputs validated before use
+- [ ] No SQL/command injection vectors
+
+If any security issue is found, mark as `REQUEST CHANGES` — do not approve a PR with
+unresolved security findings.
+
+---
+
+### Step 5 — Review for code quality
+
+Using `code/docs/CODING-PRINCIPLES.md` as a reference:
+
+- [ ] Functions are short and focused (single responsibility)
+- [ ] Names are descriptive (no single-letter variables except loop counters)
+- [ ] No unnecessary clones or allocations
+- [ ] No commented-out code
+- [ ] File length ≤ 750 lines
+- [ ] All public items have doc comments
+
+---
+
+### Step 6 — Check tests
+
+- [ ] New functionality has test coverage
+- [ ] Error paths are tested
+- [ ] No tests removed without explanation
+- [ ] Security-critical code has property-based tests
+
+---
+
+### Step 7 — Leave a structured review
+
+Use `/rust-security:review-code` to generate a detailed review report if the change
+is large or security-critical.
+
+Submit your review with one of:
+- **Approve** — all checks pass, no issues found
+- **Comment** — minor suggestions, not blocking
+- **Request changes** — correctness or security issues must be fixed
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before approving or requesting changes.

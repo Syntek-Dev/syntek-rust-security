@@ -1,7 +1,7 @@
 # Releases
 
-**Last Updated**: 05/04/2026
-**Version**: 1.1.0
+**Last Updated**: 11/04/2026
+**Version**: 1.2.0
 **Maintained By**: Development Team
 **Language**: British English (en_GB)
 **Timezone**: Europe/London
@@ -9,6 +9,84 @@
 ---
 
 Official release information for syntek-rust-security plugin.
+
+---
+
+## v1.2.0 - Project Scaffolding System (11 April 2026)
+
+**Release Type**: Minor
+**Stability**: Stable
+**Download**: [GitHub Releases](https://github.com/Syntek-Studio/syntek-rust-security/releases/tag/v1.2.0)
+
+### Highlights
+
+This release introduces the `/scaffold` command — a new way to instantly set up
+a structured documentation and workflow system for any Rust project you are
+working on with this plugin.
+
+#### What's New
+
+**`/scaffold` Command**
+
+Running `/scaffold` in your project generates a three-layer structure that helps
+Claude Code (and your team) navigate your project consistently:
+
+1. **`.claude/CLAUDE.md`** — A routing file that directs Claude to the correct
+   workflow, how-to, or PM document for any given task. This reduces the need to
+   explain project context on every invocation.
+
+2. **`docs/workflows/`** — Step-by-step workflow documents for common development
+   tasks. The scaffold pre-generates workflows for:
+   - Creating a new module (`01-new-module`)
+   - Test-driven development (`02-tdd`)
+   - Releasing a version (`06-release`)
+
+3. **`docs/how-to/` and `docs/pm/`** — How-to and project management reference
+   documents. Pre-generated entries cover initial setup and PR review/audit
+   workflows.
+
+Each workflow consists of a **STEPS.md** (the procedure to follow) and a
+**CHECKLIST.md** (a checklist to verify completion).
+
+**`CONTEXT.md`** — A root-level context file that gives Claude a brief
+description of the project, loaded automatically on every agent invocation.
+
+**`GAPS.md`** — A tracking file pre-populated with 9 open workflow gaps,
+listing the workflows that have not yet been defined for this project. As you
+add workflows, remove entries from GAPS.md to track progress.
+
+#### Why This Matters
+
+Large Rust projects accumulate complex workflows — security audits, release
+procedures, FFI integration steps, and more. Without structured documentation,
+agents must re-discover context on every run. The scaffold system solves this by
+giving Claude a consistent, predictable place to look for project-specific
+instructions.
+
+#### Path Portability
+
+Example files in the plugin's own library now use portable paths instead of
+hardcoded user-specific paths. This means examples compile and run correctly on
+any developer's machine without modification.
+
+### Breaking Changes
+
+None. The `/scaffold` command is additive and does not modify any existing
+project files.
+
+### System Requirements
+
+- Claude Code >= 1.0.0
+- syntek-dev-suite >= 1.0.0
+- Rust >= 1.92.0
+
+### Documentation
+
+- [README.md](README.md) - Plugin overview
+- [CHANGELOG.md](CHANGELOG.md) - Full change history
+- [CLAUDE.md](CLAUDE.md) - Plugin configuration and agent reference
+- [commands/scaffold.md](commands/scaffold.md) - Scaffold command reference
+- [templates/scaffold/](templates/scaffold/) - All 20 scaffold templates
 
 ---
 
@@ -400,17 +478,7 @@ SHA256 (syntek-rust-security-0.1.0.tar.gz):
 
 ## Upcoming Releases
 
-### v1.1.0 (Planned)
-
-**Focus**: Enhanced fuzzing and additional Rust frameworks
-
-- Async fuzzing support (tokio, async-std)
-- Diesel ORM security patterns
-- Rocket/Actix/Axum framework-specific agents
-- WebAssembly security analysis
-- SARIF output format support
-
-### v1.2.0 (Planned)
+### v1.3.0 (Planned)
 
 **Focus**: Enterprise features and integrations
 

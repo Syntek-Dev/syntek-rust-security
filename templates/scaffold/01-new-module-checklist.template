@@ -1,0 +1,52 @@
+# CHECKLIST — 01-new-module
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every item must be checked before this workflow is considered complete.
+
+---
+
+## Definition of done
+
+### Module structure
+- [ ] Module responsibility can be stated in one sentence
+- [ ] Module file created at the correct path (`src/{name}.rs` or `src/{name}/mod.rs`)
+- [ ] Module declared in `src/lib.rs` or `src/main.rs`
+- [ ] File is under 750 lines (including comments)
+
+### Public API
+- [ ] All public types, traits, and functions are intentional (nothing accidentally public)
+- [ ] All public items have doc comments (`///`)
+- [ ] `# Examples` sections present for primary public functions
+- [ ] `# Errors` section present for all fallible functions
+- [ ] `cargo test --doc` passes (doc examples compile and run)
+
+### Error handling
+- [ ] No `unwrap()` or `expect()` in non-test code
+- [ ] All errors propagated with `?` or explicitly handled
+- [ ] Error types implement `std::error::Error`
+
+### Safety
+- [ ] No new `unsafe` blocks without a `// SAFETY:` comment explaining invariants
+- [ ] No `#[allow(...)]` without a comment explaining why it is acceptable
+
+### Tests
+- [ ] At least one happy-path unit test
+- [ ] At least one error-case unit test
+- [ ] Property-based tests added for complex or security-critical logic
+
+### Code quality
+- [ ] `cargo fmt --check` passes
+- [ ] `cargo clippy -- -D warnings` passes (zero warnings)
+- [ ] `cargo test` passes (all tests green)
+- [ ] `cargo doc --no-deps` builds without warnings
+
+### Documentation
+- [ ] `CHANGELOG.md` updated if this adds a user-facing feature
+
+---
+
+## Sign-off
+
+- [ ] This workflow is complete and all items above are checked

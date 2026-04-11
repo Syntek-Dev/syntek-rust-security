@@ -1,0 +1,55 @@
+# CHECKLIST — 05-code-review
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every applicable item must be checked before submitting a review.
+
+---
+
+## Definition of done
+
+### Understanding
+- [ ] PR description is clear and the purpose is understood
+- [ ] Scope matches the linked ticket
+
+### Automated checks (on reviewer's machine)
+- [ ] `cargo fmt --check` passes on the PR branch
+- [ ] `cargo clippy -- -D warnings` passes
+- [ ] `cargo test` passes
+- [ ] `cargo test --doc` passes
+
+### Correctness
+- [ ] Logic does what the description says
+- [ ] Edge cases are handled
+- [ ] Error paths are correct (no silent failures)
+- [ ] No `unwrap()` or `expect()` in non-test code
+
+### Security
+- [ ] No new `unsafe` blocks without `// SAFETY:` comments
+- [ ] Only approved cryptographic algorithms used (if applicable)
+- [ ] No hardcoded secrets or credentials
+- [ ] No sensitive data in log statements
+- [ ] External inputs validated
+
+### Code quality
+- [ ] Functions are short and focused
+- [ ] Names are descriptive
+- [ ] No unnecessary clones
+- [ ] No commented-out code
+- [ ] File length ≤ 750 lines
+
+### Tests
+- [ ] New functionality has test coverage
+- [ ] Error paths are tested
+- [ ] No tests removed without explanation
+
+### Review submitted
+- [ ] Review submitted with appropriate status (Approve / Comment / Request Changes)
+- [ ] All inline comments are clear and actionable
+
+---
+
+## Sign-off
+
+- [ ] This code review is complete and all applicable items above are checked

@@ -950,7 +950,7 @@ mod tests {
 
         assert!(monitor.is_excluded(Path::new("/tmp/test.tmp")));
         assert!(monitor.is_excluded(Path::new("/var/log/app.log")));
-        assert!(!monitor.is_excluded(Path::new("/home/user/file.txt")));
+        assert!(!monitor.is_excluded(Path::new("/data/storage/file.txt")));
     }
 
     #[test]

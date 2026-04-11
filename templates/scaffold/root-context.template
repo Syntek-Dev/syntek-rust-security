@@ -1,0 +1,59 @@
+# {{project_name}}
+
+**Date**: {{current_date}}
+**Type**: {{project_type}}
+**Description**: {{project_description}}
+
+---
+
+## Purpose
+
+{{project_description}}
+
+## Entry point
+
+`{{entry_point}}`
+
+## Detected stack
+
+{{stack_summary}}
+
+---
+
+## Project structure
+
+```
+{{project_name}}/
+├── .claude/
+│   └── CLAUDE.md              # Routing, MCP servers, naming conventions, gap rules
+├── CONTEXT.md                 # This file
+├── GAPS.md                    # Workflow gap register
+├── Cargo.toml                 # Rust build manifest
+├── src/                       # Rust source code
+│
+├── code/                      # Development layer — coding standards, source pointer, dev workflows
+├── how-to/                    # Operational layer — setup, git workflow, versioning
+└── project-management/        # PM layer — architecture decisions, planning, code review, security audit
+```
+
+## Routing
+
+See `.claude/CLAUDE.md` for the full routing table — which folder and workflow to consult
+for any given task.
+
+**Quick reference:**
+
+| I want to… | Go to… |
+|------------|--------|
+| Write or review code | `code/docs/CODING-PRINCIPLES.md` |
+| Add a new module | `code/workflows/01-new-module/` |
+| Write tests first | `code/workflows/02-tdd-cycle/` |
+| Cut a release | `code/workflows/06-release-process/` |
+| Set up the project | `how-to/workflows/01-setup/` |
+| Review a PR | `project-management/workflows/05-code-review/` |
+| Run a security audit | `project-management/workflows/06-security-audit/` |
+
+## Gap register
+
+`GAPS.md` lists every workflow folder that has a `CONTEXT.md` but is missing `STEPS.md`
+or `CHECKLIST.md`. Fill gaps with: `/scaffold --fill-gaps <workflow-path>`

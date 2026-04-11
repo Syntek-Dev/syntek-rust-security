@@ -1,0 +1,16 @@
+# {{workflow_number}}-{{workflow_name}}
+
+**What**: {{workflow_what}}
+**When to trigger**: {{workflow_trigger}}
+**Produces**: {{workflow_produces}}
+**Dependencies**: {{workflow_dependencies}}
+
+## Gap status
+
+`STEPS.md` and `CHECKLIST.md` have not yet been written for this workflow.
+They are registered in `GAPS.md`. Use this `CONTEXT.md` as best-effort guidance until filled.
+
+To fill this gap:
+```
+/scaffold --fill-gaps {{workflow_path}}
+```

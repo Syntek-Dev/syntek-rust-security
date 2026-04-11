@@ -1,0 +1,171 @@
+# STEPS — 06-security-audit
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> These steps are mandatory. Run a complete audit before any major release or
+> after adding cryptographic features, external integrations, or unsafe code.
+> Read `project-management/workflows/06-security-audit/CONTEXT.md` and
+> `project-management/docs/SECURITY.md` before beginning.
+
+---
+
+## Prerequisites
+
+- [ ] All security tools installed (see `how-to/workflows/01-setup/`)
+- [ ] `cargo audit`, `cargo deny`, `cargo geiger` working
+- [ ] `project-management/docs/SECURITY.md` has been read
+- [ ] Access to the full codebase on the branch being audited
+
+---
+
+## Steps
+
+### Step 1 — Dependency vulnerability scan
+
+```bash
+cargo audit
+```
+
+Review every finding:
+- **Critical / High**: must be resolved before release (upgrade or replace crate)
+- **Medium**: document and track; resolve in next patch if exploitable
+- **Low / Informational**: track in issues
+
+```bash
+cargo deny check advisories   # cross-check against deny.toml allowlist
+cargo deny check bans         # check for banned or duplicate crates
+cargo deny check licenses     # check licence compatibility
+```
+
+**Output**: List of findings with severity and planned resolution.
+
+---
+
+### Step 2 — Unsafe code audit
+
+```bash
+cargo geiger --quiet          # count unsafe blocks
+```
+
+For each `unsafe` block found, verify:
+- A `// SAFETY:` comment explains the invariant being upheld
+- The unsafe block is as small as possible
+- No safe alternative exists
+
+For a detailed analysis, run:
+
+```bash
+/rust-security:memory-audit
+```
+
+**Output**: Unsafe block count, list of undocumented unsafe code.
+
+---
+
+### Step 3 — Cryptographic implementation review
+
+If the project uses cryptographic code (`has_crypto`):
+
+```bash
+/rust-security:crypto-review
+```
+
+Verify:
+- Only approved algorithms: AES-256-GCM, ChaCha20-Poly1305, SHA-256, SHA-3, Ed25519, X25519
+- No banned algorithms: MD5, SHA-1, ECB mode, DES, RC4
+- Keys are never hardcoded
+- Nonces are generated with CSPRNG (never counters in distributed systems)
+- Constant-time comparisons where timing attacks are possible
+- Secrets zeroised on drop (using `zeroize` crate)
+
+**Output**: Cryptographic review report.
+
+---
+
+### Step 4 — Secrets scan
+
+```bash
+/rust-security:scan-secrets
+```
+
+Check for accidentally committed secrets:
+- API keys, tokens, passwords in source code
+- Hardcoded connection strings
+- Private keys in any file
+
+**Output**: Zero secrets committed to the repository.
+
+---
+
+### Step 5 — Supply chain audit
+
+```bash
+/rust-security:supply-chain-audit
+```
+
+Review:
+- New or recently updated dependencies (check changelogs)
+- Crates with very few downloads or recent ownership transfers
+- Dependencies with more access than needed
+
+**Output**: Supply chain risk assessment.
+
+---
+
+### Step 6 — STRIDE threat model review
+
+Review or update the threat model for any new features since the last audit:
+
+```bash
+/rust-security:threat-model
+```
+
+For each threat:
+- **Spoofing**: authentication controls in place?
+- **Tampering**: data integrity controls in place?
+- **Repudiation**: audit logging in place?
+- **Information disclosure**: sensitive data protected?
+- **Denial of service**: rate limiting, resource limits in place?
+- **Elevation of privilege**: authorisation controls in place?
+
+**Output**: Updated threat model with new threats identified and mitigated.
+
+---
+
+### Step 7 — Generate compliance report
+
+```bash
+/rust-security:compliance-report
+```
+
+Generate a OWASP/CWE-mapped report of all findings from Steps 1–6.
+
+Save the report to `project-management/src/security-audit-{date}.md`.
+
+---
+
+### Step 8 — Document and prioritise findings
+
+For each finding from Steps 1–7:
+1. Assign a severity (Critical / High / Medium / Low)
+2. Create a tracking issue (GitHub Issues or PM tool)
+3. Link to the relevant CWE entry
+4. Set a resolution target
+
+**Critical and High findings must be resolved before the audit is closed.**
+
+---
+
+### Step 9 — Remediate and re-run
+
+For each Critical/High finding:
+1. Implement the fix following `code/workflows/01-new-module/` or `02-tdd-cycle/`
+2. Re-run the relevant scan from Steps 1–6 to confirm resolution
+3. Update the compliance report
+
+---
+
+## On completion
+
+Open `CHECKLIST.md` and verify every item before marking this audit complete.

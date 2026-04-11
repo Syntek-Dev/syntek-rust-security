@@ -1,0 +1,35 @@
+# CHECKLIST — {{workflow_number}}-{{workflow_name}}
+
+**Project**: {{project_name}}
+**Generated**: {{current_date}}
+
+> Every item must be checked before this workflow is considered complete.
+> If an item cannot be checked, document why in a comment below it.
+
+---
+
+## Definition of done
+
+### Correctness
+- [ ] All steps in `STEPS.md` were followed in order
+- [ ] `cargo test` passes with no failures
+- [ ] `cargo clippy -- -D warnings` passes with no warnings
+
+### Code quality
+- [ ] `cargo fmt --check` passes
+- [ ] No `unwrap()` or `expect()` added in library code
+- [ ] Public items have doc comments
+
+### Security
+- [ ] No new `unsafe` blocks added without a `// SAFETY:` comment
+- [ ] No secrets or credentials committed
+
+### Documentation
+- [ ] `CHANGELOG.md` updated if this workflow produced user-facing changes
+- [ ] Relevant `CONTEXT.md` files updated if folder purpose changed
+
+---
+
+## Sign-off
+
+- [ ] This workflow is complete and all items above are checked
