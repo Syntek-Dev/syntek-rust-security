@@ -2,7 +2,7 @@
   "name": "syntek-rust-security-marketplace",
   "owner": {
     "name": "Syntek Studio",
-    "url": "https://github.com/Syntek-Studio/syntek-rust-security"
+    "url": "https://github.com/Syntek-Dev/syntek-rust-security"
   },
   "plugins": [
     {

@@ -4,7 +4,7 @@
   "description": "Comprehensive Rust security tooling for Claude Code - threat modeling, vulnerability scanning, cryptographic patterns, and infrastructure security",
   "author": {
     "name": "Syntek Studio",
-    "url": "https://github.com/Syntek-Studio/syntek-rust-security"
+    "url": "https://github.com/Syntek-Dev/syntek-rust-security"
   },
   "keywords": [
     "claude-code",
